@@ -41,6 +41,8 @@ export {
   collectCreateCapabilityFeedback,
   collectCreateDuplicateStepIdFeedback,
   collectCreateStepCountFeedback,
+  collectCreateWorkflowIoFeedback,
+  collectGenerateReturnsTypeFeedback,
   inferPatchTargetStepId,
   inferRequiredCapabilityIds,
   inferRequiredStepCount,

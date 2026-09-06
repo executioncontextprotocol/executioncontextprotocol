@@ -392,6 +392,19 @@ export async function assertDeterministic(
         ).toBe(true)
         break
       }
+      case "workflowReturnsPropertyType": {
+        const wf = harnessOutput.artifact as WorkflowManifest
+        const field = jsonSchemaObjectProperties(
+          wf.workflow?.returns as Record<string, unknown> | undefined
+        ).find((p) => p.name === assertion.property)
+        expect(field, `${label} workflow.returns property ${assertion.property}`).toBeDefined()
+        const actualType =
+          typeof field?.schema.type === "string" ? field.schema.type : "unknown"
+        expect(actualType, `${label} workflow.returns.${assertion.property} type`).toBe(
+          assertion.type
+        )
+        break
+      }
       default:
         break
     }

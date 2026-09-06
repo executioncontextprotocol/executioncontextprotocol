@@ -79,6 +79,11 @@ const deterministicAssertionSchema = z.discriminatedUnion("kind", [
     property: z.string(),
     asKey: z.string(),
   }),
+  z.object({
+    kind: z.literal("workflowReturnsPropertyType"),
+    property: z.string(),
+    type: z.enum(["string", "number", "integer", "boolean", "object", "array", "null", "unknown"]),
+  }),
 ])
 
 const judgeAssertionSchema = z.object({

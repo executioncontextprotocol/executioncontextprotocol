@@ -55,6 +55,9 @@ export function typescriptPrimerForOutputSchema(outputSchema: string): string {
           "Use .id(\"stepId\") on steps when ids must stay stable across edits.",
           "Chain .accepts({...}) and .returns({...}) before .run() for workflow I/O schemas.",
           "Wire accepts keys with ref(\"key\") — not ref(\"step.output\") for run input.",
+          ".as(\"key\") stores the entire capability output under state.key.",
+          "A .returns property that maps to an .as key must match that capability output type.",
+          "Model *.generate outputs are objects with text — type returns as object (not string); chain with ref(\"prior.text\").",
           "Never output the word typescript on its own line before imports.",
         ]
       : []

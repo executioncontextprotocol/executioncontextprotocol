@@ -122,6 +122,30 @@
         ],
         "judge": { "enabled": false }
       }
+    },
+    {
+      "id": "wf-create-io-07",
+      "suite": "workflow-create",
+      "title": "Chrome AI generate accepts and object returns",
+      "harness": "workflow-authoring",
+      "model": "default",
+      "input": {
+        "request": "Create chrome-generate-from-prompt with .accepts prompt string, one @executioncontrolprotocol/chrome-ai.generate step .as(\"response\") from ref(\"prompt\"), and .returns object response (not string)."
+      },
+      "assertions": {
+        "deterministic": [
+          { "kind": "invokeSuccess" },
+          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
+          { "kind": "validationValid" },
+          { "kind": "stepUses", "capabilityId": "@executioncontrolprotocol/chrome-ai.generate" },
+          { "kind": "workflowAcceptsHasProperties", "properties": ["prompt"] },
+          { "kind": "workflowAcceptsRefUsed", "property": "prompt" },
+          { "kind": "workflowReturnsHasProperties", "properties": ["response"] },
+          { "kind": "workflowReturnsMapsAs", "property": "response", "asKey": "response" },
+          { "kind": "workflowReturnsPropertyType", "property": "response", "type": "object" }
+        ],
+        "judge": { "enabled": false }
+      }
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "id": "workflow-authoring-create",
   "role": "You are an ECP workflow author for small local models. You build valid @executioncontrolprotocol.workflow documents from the user request and the environment capability summary.",
-  "task": "Create a workflow manifest as compact headerless EQL only. Output exactly one WORKFLOW document — never repeat a second WORKFLOW header or copy multiple examples. Use ACCEPTS / RETURNS typed-field blocks (WITH name:type, OUT name:type) before STEP lines when the request defines run input or workflow output. Wire accepts keys with WITH field = REF key. Every step must USE a real capability id from the summary. When the request names N capabilities or says two-step or 3-step, output exactly N STEP lines in order. When the request says one step or minimal workflow, output exactly ONE STEP line. Every STEP must have a unique short step id; when reusing the same USES capability more than once, pick distinct ids by role (e.g. poem, summarize) — never repeat the capability suffix. Chain steps with WITH field = REF priorStep.output when passing outputs between steps. Include WORKFLOW id and optional label, then STEP lines with LABEL, WITH, and AS.",
+  "task": "Create a workflow manifest as compact headerless EQL only. Output exactly one WORKFLOW document — never repeat a second WORKFLOW header or copy multiple examples. Use ACCEPTS / RETURNS typed-field blocks (WITH name:type, OUT name:type) before STEP lines when the request defines run input or workflow output. Wire accepts keys with WITH field = REF key. RETURNS OUT types must match AS values — model *.generate stores an object with text, so use OUT key:object! (never string). Every step must USE a real capability id from the summary. When the request names N capabilities or says two-step or 3-step, output exactly N STEP lines in order. When the request says one step or minimal workflow, output exactly ONE STEP line. Every STEP must have a unique short step id; when reusing the same USES capability more than once, pick distinct ids by role (e.g. poem, summarize) — never repeat the capability suffix. Chain steps with WITH field = REF priorStep.output or REF priorStep.text when passing outputs between steps. Include WORKFLOW id and optional label, then STEP lines with LABEL, WITH, and AS.",
   "outputSchema": "@executioncontrolprotocol.workflow",
   "promptFormat": "eql",
   "fewShots": [
@@ -48,6 +48,10 @@
     {
       "message": "Create echo-from-input with ACCEPTS value:string! and echo wired from REF value.",
       "output": "WORKFLOW echo-from-input \"Echo from input\"\nACCEPTS\n  WITH value:string!\nRETURNS\n  OUT echo:object!\nSTEP echo USES @executioncontrolprotocol/test.echo\n  LABEL \"Echo\"\n  WITH value = REF value\n  AS echo"
+    },
+    {
+      "message": "Create chrome-generate-from-prompt with ACCEPTS prompt:string!, one @executioncontrolprotocol/chrome-ai.generate step AS response wired from REF prompt, and RETURNS OUT response:object!.",
+      "output": "WORKFLOW chrome-generate-from-prompt \"Chrome generate from prompt\"\nACCEPTS\n  WITH prompt:string!\nRETURNS\n  OUT response:object!\nSTEP generate USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Generate\"\n  WITH prompt = REF prompt\n  AS response"
     }
   ],
   "repairHint": "Return corrected @executioncontrolprotocol.workflow EQL only. Output exactly one WORKFLOW block. Every STEP USES must match a capability id named in the user request. When the request names multiple capabilities, output one STEP per capability in order. When the request asks for one or minimal step, output exactly ONE STEP line. Every STEP must have a unique short step id; when reusing the same USES capability twice, use distinct ids (poem, summarize) — never repeat the capability suffix."

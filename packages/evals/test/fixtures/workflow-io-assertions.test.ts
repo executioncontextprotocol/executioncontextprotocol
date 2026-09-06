@@ -62,4 +62,15 @@ describe("workflow I/O eval assertions debug", () => {
     )
     expect(actual).toContain("absent")
   })
+
+  it("describes workflowReturnsPropertyType", async () => {
+    const assertion: DeterministicAssertion = {
+      kind: "workflowReturnsPropertyType",
+      property: "echo",
+      type: "object",
+    }
+    const actual = await extractAssertionActual(assertion, workflowArtifact())
+    expect(actual).toContain("echo")
+    expect(actual).toContain("object")
+  })
 })

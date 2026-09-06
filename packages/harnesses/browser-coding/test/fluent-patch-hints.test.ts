@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest"
 import type { WorkflowManifest } from "@executioncontrolprotocol/types"
 import {
   buildFluentPatchHintLines,
+  collectCreateWorkflowIoFeedback,
   collectFluentCompileErrorFeedback,
   collectFluentPatchGoalFeedback,
 } from "../src/fluent-patch-hints.js"
@@ -103,5 +104,100 @@ describe("collectFluentPatchGoalFeedback", () => {
     expect(
       feedback!.some((f) => f.issues.some((i) => i.message.includes("echo")))
     ).toBe(true)
+  })
+
+  it("flags string returns on chrome-ai.generate .as key", () => {
+    const patched: WorkflowManifest = {
+      schema: "@executioncontrolprotocol.workflow",
+      version: "1.0.0",
+      workflow: {
+        id: "skip-echo",
+        label: "Skip Echo",
+        returns: {
+          type: "object",
+          properties: { response: { type: "string" } },
+          required: ["response"],
+        },
+      },
+      steps: [
+        {
+          type: "step",
+          id: "generate",
+          uses: "@executioncontrolprotocol/chrome-ai.generate",
+          label: "Generate",
+          as: "response",
+        },
+      ],
+    }
+    const feedback = collectFluentPatchGoalFeedback(
+      "Fix the returns schema.",
+      patched,
+      { capabilities: [], extensions: [] } as import("@executioncontrolprotocol/core").CompactEnvironmentSummary
+    )
+    expect(
+      feedback!.some((f) => f.issues.some((i) => /type "object"/.test(i.message)))
+    ).toBe(true)
+  })
+})
+
+describe("collectCreateWorkflowIoFeedback generate returns", () => {
+  it("flags string returns for generate without I/O keywords in the request", () => {
+    const wf: WorkflowManifest = {
+      schema: "@executioncontrolprotocol.workflow",
+      version: "1.0.0",
+      workflow: {
+        id: "skip-echo",
+        label: "Skip Echo",
+        returns: {
+          type: "object",
+          properties: { response: { type: "string" } },
+          required: ["response"],
+        },
+      },
+      steps: [
+        {
+          type: "step",
+          id: "generate",
+          uses: "@executioncontrolprotocol/chrome-ai.generate",
+          label: "Generate",
+          as: "response",
+        },
+      ],
+    }
+    const feedback = collectCreateWorkflowIoFeedback("Create a chrome generate workflow", wf)
+    expect(
+      feedback!.some((f) => f.issues.some((i) => /type "object"/.test(i.message)))
+    ).toBe(true)
+  })
+
+  it("does not flag object returns for generate", () => {
+    const wf: WorkflowManifest = {
+      schema: "@executioncontrolprotocol.workflow",
+      version: "1.0.0",
+      workflow: {
+        id: "ok",
+        label: "Ok",
+        returns: {
+          type: "object",
+          properties: {
+            response: {
+              type: "object",
+              properties: { text: { type: "string" } },
+            },
+          },
+          required: ["response"],
+        },
+      },
+      steps: [
+        {
+          type: "step",
+          id: "generate",
+          uses: "@executioncontrolprotocol/chrome-ai.generate",
+          label: "Generate",
+          as: "response",
+        },
+      ],
+    }
+    expect(collectCreateWorkflowIoFeedback("Create chrome generate", wf)).toBeUndefined()
   })
 })

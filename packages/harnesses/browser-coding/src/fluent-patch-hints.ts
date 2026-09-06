@@ -2,6 +2,7 @@ import { collectModelOutputFeedback, jsonSchemaObjectProperties, type CompactEnv
 import {
   inferPatchTargetStepId,
   inferRequiredCapabilityIds,
+  collectGenerateReturnsTypeFeedback,
 } from "@executioncontrolprotocol/harnesses-browser-nano"
 import type { HarnessOperationFeedback, StepNode, WorkflowManifest } from "@executioncontrolprotocol/types"
 
@@ -482,6 +483,9 @@ export function collectFluentPatchGoalFeedback(
     }
   }
 
+  const typeFeedback = collectGenerateReturnsTypeFeedback(patched, "fluent")
+  if (typeFeedback) feedback.push(...typeFeedback)
+
   return feedback.length > 0 ? feedback : undefined
 }
 
@@ -493,11 +497,12 @@ export function collectCreateWorkflowIoFeedback(
   request: string,
   manifest: WorkflowManifest
 ): HarnessOperationFeedback[] | undefined {
+  const typeFeedback = collectGenerateReturnsTypeFeedback(manifest, "fluent") ?? []
   const lower = request.toLowerCase()
   if (!/\baccepts?\b|\breturns?\b|\brun\s+input\b/i.test(lower)) {
-    return undefined
+    return typeFeedback.length > 0 ? typeFeedback : undefined
   }
-  const feedback: HarnessOperationFeedback[] = []
+  const feedback: HarnessOperationFeedback[] = [...typeFeedback]
   const acceptsProp = inferAcceptsPropertyFromRequest(request)
   const returnsProp = inferReturnsPropertyFromRequest(request)
   const acceptsNames = workflowIoNames(manifest, "accepts")

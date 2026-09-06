@@ -786,6 +786,50 @@ export function collectPatchGoalFeedback(
     }
   }
 
+  const typeFeedback = collectGenerateReturnsTypeFeedback(patched, "eql")
+  if (typeFeedback) feedback.push(...typeFeedback)
+
+  return feedback.length > 0 ? feedback : undefined
+}
+
+function isGenerateCapabilityId(capabilityId: string): boolean {
+  return capabilityId.endsWith(".generate")
+}
+
+/**
+ * Flag RETURNS properties typed as string when they map to a *.generate .as key.
+ * Generate capabilities store `{ text }` objects, not bare strings.
+ * @internal
+ */
+export function collectGenerateReturnsTypeFeedback(
+  manifest: WorkflowManifest,
+  dialect: "eql" | "fluent" = "eql"
+): HarnessOperationFeedback[] | undefined {
+  const returnsFields = jsonSchemaObjectProperties(
+    manifest.workflow?.returns as Record<string, unknown> | undefined
+  )
+  if (returnsFields.length === 0) return undefined
+
+  const asToUses = new Map<string, string>()
+  for (const node of manifest.steps ?? []) {
+    if (!("uses" in node) || typeof node.uses !== "string") continue
+    if (!("as" in node) || typeof (node as { as?: unknown }).as !== "string") continue
+    const asKey = (node as { as: string }).as
+    if (!asKey) continue
+    asToUses.set(asKey, node.uses)
+  }
+
+  const feedback: HarnessOperationFeedback[] = []
+  for (const field of returnsFields) {
+    const uses = asToUses.get(field.name)
+    if (!uses || !isGenerateCapabilityId(uses)) continue
+    if (field.schema.type !== "string") continue
+    const message =
+      dialect === "fluent"
+        ? `.returns property "${field.name}" must be type "object" because .as("${field.name}") stores *.generate output { text }, not a bare string.`
+        : `RETURNS OUT ${field.name} must be object! because AS ${field.name} stores *.generate output { text }. Use OUT ${field.name}:object!, not string.`
+    feedback.push(collectModelOutputFeedback(message))
+  }
   return feedback.length > 0 ? feedback : undefined
 }
 
@@ -797,11 +841,12 @@ export function collectCreateWorkflowIoFeedback(
   request: string,
   manifest: WorkflowManifest
 ): HarnessOperationFeedback[] | undefined {
+  const typeFeedback = collectGenerateReturnsTypeFeedback(manifest, "eql") ?? []
   const lower = request.toLowerCase()
   if (!/\baccepts?\b|\breturns?\b|\brun\s+input\b/i.test(lower)) {
-    return undefined
+    return typeFeedback.length > 0 ? typeFeedback : undefined
   }
-  const feedback: HarnessOperationFeedback[] = []
+  const feedback: HarnessOperationFeedback[] = [...typeFeedback]
   const acceptsProp = inferAcceptsPropertyFromRequest(request)
   const returnsProp = inferReturnsPropertyFromRequest(request)
   const acceptsNames = workflowIoNames(manifest, "accepts")

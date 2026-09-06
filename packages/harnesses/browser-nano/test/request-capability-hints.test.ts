@@ -4,6 +4,8 @@ import {
   buildRequestCapabilityHintLines,
   collectCreateCapabilityFeedback,
   collectCreateDuplicateStepIdFeedback,
+  collectCreateWorkflowIoFeedback,
+  collectGenerateReturnsTypeFeedback,
   collectPatchGoalFeedback,
   inferPatchTargetStepId,
   inferRequiredCapabilityIds,
@@ -510,5 +512,111 @@ describe("request-capability-hints", () => {
     expect(feedback?.length).toBe(1)
     expect(feedback?.[0]?.issues[0]?.message).toContain('Duplicate step id "generate"')
     expect(feedback?.[0]?.issues[0]?.message).toContain("poem and summarize")
+  })
+})
+
+describe("collectGenerateReturnsTypeFeedback", () => {
+  it("flags string RETURNS mapped to a *.generate .as key", () => {
+    const wf: WorkflowManifest = {
+      schema: "@executioncontrolprotocol.workflow",
+      version: "1.0.0",
+      workflow: {
+        id: "skip-echo",
+        label: "Skip Echo",
+        returns: {
+          type: "object",
+          properties: { response: { type: "string" } },
+          required: ["response"],
+        },
+      },
+      steps: [
+        {
+          id: "generate",
+          uses: "@executioncontrolprotocol/chrome-ai.generate",
+          label: "Generate",
+          as: "response",
+        },
+      ],
+    }
+    const feedback = collectGenerateReturnsTypeFeedback(wf, "eql")
+    expect(feedback?.length).toBe(1)
+    expect(feedback?.[0]?.issues[0]?.message).toMatch(/object!/)
+    expect(feedback?.[0]?.issues[0]?.message).toContain("response")
+  })
+
+  it("does not flag object RETURNS on a *.generate .as key", () => {
+    const wf: WorkflowManifest = {
+      schema: "@executioncontrolprotocol.workflow",
+      version: "1.0.0",
+      workflow: {
+        id: "ok",
+        label: "Ok",
+        returns: {
+          type: "object",
+          properties: { response: { type: "object" } },
+          required: ["response"],
+        },
+      },
+      steps: [
+        {
+          id: "generate",
+          uses: "@executioncontrolprotocol/chrome-ai.generate",
+          label: "Generate",
+          as: "response",
+        },
+      ],
+    }
+    expect(collectGenerateReturnsTypeFeedback(wf)).toBeUndefined()
+  })
+
+  it("does not apply generate-specific feedback for echo string returns", () => {
+    const wf: WorkflowManifest = {
+      schema: "@executioncontrolprotocol.workflow",
+      version: "1.0.0",
+      workflow: {
+        id: "echo-str",
+        label: "Echo",
+        returns: {
+          type: "object",
+          properties: { echo: { type: "string" } },
+          required: ["echo"],
+        },
+      },
+      steps: [
+        {
+          id: "echo",
+          uses: "@executioncontrolprotocol/test.echo",
+          label: "Echo",
+          as: "echo",
+        },
+      ],
+    }
+    expect(collectGenerateReturnsTypeFeedback(wf)).toBeUndefined()
+  })
+
+  it("collectCreateWorkflowIoFeedback surfaces generate returns type errors without I/O keywords", () => {
+    const wf: WorkflowManifest = {
+      schema: "@executioncontrolprotocol.workflow",
+      version: "1.0.0",
+      workflow: {
+        id: "skip-echo",
+        label: "Skip Echo",
+        returns: {
+          type: "object",
+          properties: { response: { type: "string" } },
+          required: ["response"],
+        },
+      },
+      steps: [
+        {
+          id: "generate",
+          uses: "@executioncontrolprotocol/chrome-ai.generate",
+          label: "Generate",
+          as: "response",
+        },
+      ],
+    }
+    const feedback = collectCreateWorkflowIoFeedback("Create a chrome generate workflow", wf)
+    expect(feedback?.some((f) => f.issues.some((i) => i.message.includes("object!")))).toBe(true)
   })
 })

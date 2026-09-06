@@ -1,7 +1,7 @@
 {
   "id": "workflow-authoring-create-coding",
   "role": "You are an ECP workflow author for coding models. You build valid workflows using only the Fluent API (TypeScript).",
-  "task": "Create a workflow: import { workflow, step, ref } from \"@executioncontrolprotocol/core\" and export default workflow(...).run([...]). Start with import — never output the word typescript on its own line. Chain .accepts({...}) and .returns({...}) before .run() when the request defines run input or workflow output. Wire accepts keys with ref(\"key\"), not ref(\"step.output\"). Every step must use a real capability id from the environment summary. When the request names N capabilities or says two-step, export exactly N steps in .run([...]). When the request says one step or minimal workflow, export exactly one step in .run([...]). Chain steps with ref(\"priorStep.output\") when passing outputs. No EQL or JSON-only workflow blobs.",
+  "task": "Create a workflow: import { workflow, step, ref } from \"@executioncontrolprotocol/core\" and export default workflow(...).run([...]). Start with import — never output the word typescript on its own line. Chain .accepts({...}) and .returns({...}) before .run() when the request defines run input or workflow output. Wire accepts keys with ref(\"key\"), not ref(\"step.output\"). RETURNS property types must match .as values — model *.generate stores an object with text, so type returns as object (never string); chain nested fields with ref(\"prior.text\"). Every step must use a real capability id from the environment summary. When the request names N capabilities or says two-step, export exactly N steps in .run([...]). When the request says one step or minimal workflow, export exactly one step in .run([...]). Chain steps with ref(\"priorStep.output\") when passing outputs. No EQL or JSON-only workflow blobs.",
   "outputSchema": "@executioncontrolprotocol.workflow",
   "promptFormat": "typescript",
   "fewShots": [
@@ -40,6 +40,10 @@
     {
       "message": "Create echo-from-input workflow that accepts required string value and wires echo from ref(\"value\").",
       "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Echo from input\")\n  .id(\"echo-from-input\")\n  .accepts({ type: \"object\", properties: { value: { type: \"string\" } }, required: [\"value\"] })\n  .returns({ type: \"object\", properties: { echo: { type: \"object\" } }, required: [\"echo\"] })\n  .run([\n    step(\"@executioncontrolprotocol/test.echo\", \"Echo\").id(\"echo\").with({ value: ref(\"value\") }).as(\"echo\"),\n  ])"
+    },
+    {
+      "message": "Create chrome-generate-from-prompt with accepts prompt string, one @executioncontrolprotocol/chrome-ai.generate step as response from ref(\"prompt\"), and returns object response with text string.",
+      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Chrome generate from prompt\")\n  .id(\"chrome-generate-from-prompt\")\n  .accepts({ type: \"object\", properties: { prompt: { type: \"string\" } }, required: [\"prompt\"] })\n  .returns({\n    type: \"object\",\n    properties: {\n      response: {\n        type: \"object\",\n        properties: { text: { type: \"string\" } },\n        required: [\"text\"],\n      },\n    },\n    required: [\"response\"],\n  })\n  .run([\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Generate\")\n      .id(\"generate\")\n      .with({ prompt: ref(\"prompt\") })\n      .as(\"response\"),\n  ])"
     }
   ],
   "repairHint": "Return corrected Fluent TypeScript only. Every step capability must exist in the environment summary. One-step requests must export exactly one step(). Never use identifier typescript."

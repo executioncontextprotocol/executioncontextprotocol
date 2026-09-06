@@ -24,6 +24,7 @@ export const EQL_VALUE_EXPRESSIONS = [
   "- {\"field\": \"value\"} JSON object",
   "- REF <acceptsKey> — read workflow run input (accepts property seeds state.<key>)",
   "- REF <stepId>.output — reference another step's output (chain steps this way)",
+  "- REF <asKey>.text — read nested fields on a prior AS value (e.g. model *.generate output has text)",
 ].join("\n")
 
 export const EQL_WORKFLOW_IO = [
@@ -35,6 +36,9 @@ export const EQL_WORKFLOW_IO = [
   "- Types: string, number, integer, boolean, object, array, file, unknown",
   "- Suffix ! marks required fields (e.g. value:string!)",
   "- Place ACCEPTS / RETURNS after WORKFLOW line and before STEP lines.",
+  "- AS <key> stores the entire capability output under state.<key>.",
+  "- A RETURNS OUT field that maps to an AS key must match that capability output type.",
+  "- Model *.generate outputs are objects with text — use OUT <key>:object!, never string.",
 ].join("\n")
 
 export const EQL_WORKFLOW_OPERATIONS = [
