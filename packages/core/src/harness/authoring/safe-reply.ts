@@ -1,7 +1,8 @@
-import { ECP_HARNESS_REPLY_SCHEMA, type HarnessReply, type HarnessRunContext, type EcpIntent } from "@executioncontrolprotocol/types"
+import { ECP_HARNESS_REPLY_SCHEMA, type HarnessReply, type HarnessRunContext, type EcpIntent, type WorkflowManifest, ECP_HARNESS_REPLY_ACTIONS } from "@executioncontrolprotocol/types"
 import { isEnvironmentQuestion } from "./environment-question.js"
 import type { CompactEnvironmentSummary } from "./summarize-environment.js"
 import { summarizeHarnessRunContext } from "./summarize-run-context.js"
+import { summarizeWorkflowManifest } from "./summarize-workflow.js"
 
 /** Shared redirect phrase for safe-reply and out-of-scope assistant answers. @category Harness */
 export const HARNESS_ASSISTANT_SCOPE_REDIRECT_PHRASE =
@@ -236,4 +237,80 @@ export function tryBuildRegisterRefusalReply(message: string): HarnessReply | un
   return buildAssistantSafeReply(
     "I cannot register or install extensions in this environment — I can only use capabilities that are already loaded. Ask about workflows, ECP, or available capabilities."
   )
+}
+
+function stepKey(step: { id: string; uses: string; label?: string }): string {
+  return `${step.id}|${step.uses}|${step.label ?? ""}`
+}
+
+/**
+ * Deterministic conversational summary after a successful create/patch, with offer-run.
+ * Used as the last-shot fallback when the model fails to produce a change summary.
+ * @category Harness
+ */
+export function tryBuildChangeSummaryReply(
+  baseline: WorkflowManifest | undefined,
+  authored: WorkflowManifest
+): HarnessReply {
+  const after = summarizeWorkflowManifest(authored)
+  const before = baseline ? summarizeWorkflowManifest(baseline) : undefined
+
+  let changeLine: string
+  if (!before) {
+    const stepList =
+      after.steps.length === 0
+        ? "no steps"
+        : after.steps.map((s) => s.id).join(", ")
+    changeLine = `I created workflow "${after.workflowLabel ?? after.workflowId}" with ${stepList}.`
+  } else {
+    const beforeIds = new Set(before.steps.map((s) => s.id))
+    const afterIds = new Set(after.steps.map((s) => s.id))
+    const added = after.steps.filter((s) => !beforeIds.has(s.id)).map((s) => s.id)
+    const removed = before.steps.filter((s) => !afterIds.has(s.id)).map((s) => s.id)
+    const beforeById = new Map(before.steps.map((s) => [s.id, s]))
+    const labelChanges: string[] = []
+    for (const step of after.steps) {
+      const prev = beforeById.get(step.id)
+      if (prev && stepKey(prev) !== stepKey(step) && prev.label !== step.label) {
+        labelChanges.push(`${step.id} → "${step.label ?? step.id}"`)
+      }
+    }
+    const parts: string[] = []
+    if (added.length > 0) parts.push(`added ${added.join(", ")}`)
+    if (removed.length > 0) parts.push(`removed ${removed.join(", ")}`)
+    if (labelChanges.length > 0) parts.push(`updated labels (${labelChanges.join("; ")})`)
+    if (
+      before.workflowLabel !== after.workflowLabel &&
+      after.workflowLabel !== undefined
+    ) {
+      parts.push(`renamed workflow to "${after.workflowLabel}"`)
+    }
+    const acceptsChanged =
+      before.accepts.join(",") !== after.accepts.join(",") ||
+      before.returns.join(",") !== after.returns.join(",")
+    if (acceptsChanged) parts.push("updated workflow inputs/outputs")
+
+    changeLine =
+      parts.length > 0
+        ? `I updated the workflow: ${parts.join("; ")}.`
+        : "I updated the workflow as requested."
+  }
+
+  return {
+    schema: ECP_HARNESS_REPLY_SCHEMA,
+    answer: `${changeLine} Want me to run it?`,
+    suggestedAction: ECP_HARNESS_REPLY_ACTIONS.OFFER_RUN,
+  }
+}
+
+/**
+ * Conversational fallback when authoring fails — never offers run.
+ * @category Harness
+ */
+export function buildAuthoringFailureReply(detail?: string): HarnessReply {
+  const base =
+    detail && detail.trim().length > 0
+      ? `I could not update the workflow: ${detail.trim()}. Try rephrasing the change.`
+      : "I could not update the workflow cleanly — try rephrasing the change."
+  return buildAssistantSafeReply(base)
 }

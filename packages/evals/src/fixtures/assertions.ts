@@ -175,6 +175,16 @@ export async function assertDeterministic(
         expect(artifact.schema, `${label} reply schema`).toBe(ECP_HARNESS_REPLY_SCHEMA)
         break
       }
+      case "replyAction": {
+        const artifact = harnessOutput.artifact as HarnessReply
+        expect(artifact.suggestedAction, `${label} reply action`).toBe(assertion.value)
+        break
+      }
+      case "replyActionAbsent": {
+        const artifact = harnessOutput.artifact as HarnessReply
+        expect(artifact.suggestedAction, `${label} reply action absent`).toBeUndefined()
+        break
+      }
       case "stepUses": {
         const wf = harnessOutput.artifact as WorkflowManifest
         const uses =
@@ -312,6 +322,32 @@ export async function assertDeterministic(
         expect(shot?.promptPhase, `${label} prompt phase shot ${assertion.shotIndex}`).toBe(
           assertion.value
         )
+        break
+      }
+      case "shotTask": {
+        const shot = harnessOutput.trace?.shots?.[assertion.shotIndex]
+        expect(shot?.task, `${label} shot task ${assertion.shotIndex}`).toBe(assertion.task)
+        break
+      }
+      case "sidecarWorkflowSchema": {
+        const sidecar = harnessOutput.workflow as WorkflowManifest | undefined
+        expect(sidecar?.schema, `${label} sidecar workflow schema`).toBe(assertion.value)
+        break
+      }
+      case "sidecarStepUses": {
+        const sidecar = harnessOutput.workflow as WorkflowManifest | undefined
+        const uses =
+          sidecar?.steps
+            ?.map((s) => ("uses" in s && typeof s.uses === "string" ? s.uses : undefined))
+            .filter((u): u is string => u !== undefined) ?? []
+        expect(uses, `${label} sidecar step uses`).toContain(assertion.capabilityId)
+        break
+      }
+      case "sidecarStepLabel": {
+        const sidecar = harnessOutput.workflow as WorkflowManifest | undefined
+        expect(sidecar, `${label} sidecar workflow present`).toBeDefined()
+        const step = findStep(sidecar!, assertion.stepId)
+        expect(step?.label, `${label} sidecar step label`).toBe(assertion.value)
         break
       }
       case "workflowAcceptsHasProperties": {

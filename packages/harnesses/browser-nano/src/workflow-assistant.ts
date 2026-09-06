@@ -101,6 +101,9 @@ function formatReplyAsEql(reply: HarnessReply): string {
     const detailPart = c.detail ? ` "${c.detail.replace(/"/g, '\\"')}"` : ""
     lines.push(`  CITATION ${c.kind}${idPart}${detailPart}`)
   }
+  if (reply.suggestedAction) {
+    lines.push(`  ACTION ${reply.suggestedAction}`)
+  }
   return lines.join("\n")
 }
 

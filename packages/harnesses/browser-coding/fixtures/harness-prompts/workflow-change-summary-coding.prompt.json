@@ -1,0 +1,26 @@
+{
+  "id": "workflow-change-summary-coding",
+  "identity": true,
+  "role": "You are the ECP assistant summarizing a workflow create or patch for a coding model.",
+  "task": "Export `export const reply: HarnessReply` with schema @executioncontrolprotocol.harness.reply and suggestedAction: \"offer-run\". Start with import type. One or two short sentences naming what changed, then ask if the user wants to run. Always set suggestedAction to offer-run. Never invent steps missing from the workflow summary.",
+  "outputSchema": "@executioncontrolprotocol.harness.reply",
+  "promptFormat": "typescript",
+  "allowedValues": {
+    "citationKind": ["step", "run", "extension", "error"],
+    "suggestedAction": ["offer-run"]
+  },
+  "fewShots": [
+    {
+      "message": "Summarize: created workflow with echo and summarize. Ask to run.",
+      "output": "import type { HarnessReply } from \"@executioncontrolprotocol/types\"\n\nexport const reply: HarnessReply = {\n  schema: \"@executioncontrolprotocol.harness.reply\",\n  answer: \"I created a workflow with echo and summarize. Want me to run it?\",\n  suggestedAction: \"offer-run\",\n}"
+    },
+    {
+      "message": "Summarize: changed echo label to Patched Echo. Ask to run.",
+      "output": "import type { HarnessReply } from \"@executioncontrolprotocol/types\"\n\nexport const reply: HarnessReply = {\n  schema: \"@executioncontrolprotocol.harness.reply\",\n  answer: \"I updated the echo step label to Patched Echo. Want me to run it?\",\n  suggestedAction: \"offer-run\",\n}"
+    },
+    {
+      "message": "Summarize: added notify after echo. Ask to run.",
+      "output": "import type { HarnessReply } from \"@executioncontrolprotocol/types\"\n\nexport const reply: HarnessReply = {\n  schema: \"@executioncontrolprotocol.harness.reply\",\n  answer: \"I added a notify step after echo. Want me to run it?\",\n  suggestedAction: \"offer-run\",\n}"
+    }
+  ]
+}

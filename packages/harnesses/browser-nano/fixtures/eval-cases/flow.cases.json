@@ -500,6 +500,53 @@
           }
         }
       ]
+    },
+    {
+      "id": "flow-10",
+      "suite": "flow",
+      "title": "Chat create then chat fix failed run",
+      "model": "default",
+      "steps": [
+        {
+          "harness": "chat",
+          "input": {
+            "message": "I need a new workflow with echo and summarize."
+          },
+          "assertions": {
+            "deterministic": [
+              { "kind": "invokeSuccess" },
+              { "kind": "classifiedIntent", "value": "workflow-create" },
+              { "kind": "shotCount", "value": 3 },
+              { "kind": "replySchema" },
+              { "kind": "replyAction", "value": "offer-run" },
+              { "kind": "sidecarWorkflowSchema", "value": "@executioncontrolprotocol.workflow" }
+            ],
+            "judge": {
+              "enabled": false
+            }
+          }
+        },
+        {
+          "harness": "chat",
+          "input": {
+            "message": "The last workflow run failed. Diagnose the errors from the run context and patch the workflow to fix them.",
+            "manifestRef": "workflows/echo-workflow.json",
+            "runContextFixture": "runs/failed-echo-step.json"
+          },
+          "assertions": {
+            "deterministic": [
+              { "kind": "invokeSuccess" },
+              { "kind": "shotCount", "value": 3 },
+              { "kind": "replySchema" },
+              { "kind": "replyAction", "value": "offer-run" },
+              { "kind": "sidecarWorkflowSchema", "value": "@executioncontrolprotocol.workflow" }
+            ],
+            "judge": {
+              "enabled": false
+            }
+          }
+        }
+      ]
     }
   ]
 }

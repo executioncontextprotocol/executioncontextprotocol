@@ -4,6 +4,7 @@ export const CODING_PROMPT_FIXTURE_IDS = {
   WORKFLOW_AUTHORING_CREATE: "workflow-authoring-create-coding",
   WORKFLOW_AUTHORING_PATCH: "workflow-authoring-patch-coding",
   WORKFLOW_ASSISTANT: "workflow-assistant-coding",
+  WORKFLOW_CHANGE_SUMMARY: "workflow-change-summary-coding",
 } as const
 
 /** Browser Coding harness prompt fixture id union. @category Harness */

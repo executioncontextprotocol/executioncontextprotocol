@@ -95,8 +95,14 @@ function parseReplyBody(
   startIndex: number,
   baseIndent: number,
   issues: ValidationIssue[]
-): { answer?: string; citations: EqlReplyCitation[]; nextIndex: number } {
+): {
+  answer?: string
+  citations: EqlReplyCitation[]
+  suggestedAction?: string
+  nextIndex: number
+} {
   let answer: string | undefined
+  let suggestedAction: string | undefined
   const citations: EqlReplyCitation[] = []
   let i = startIndex
   while (i < lines.length) {
@@ -127,10 +133,12 @@ function parseReplyBody(
         if (lit.value !== undefined) citation.detail = String(lit.value)
       }
       citations.push(citation)
+    } else if (t[0] === "ACTION" && row.tokens[1]) {
+      suggestedAction = row.tokens[1]!.toLowerCase()
     }
     i++
   }
-  return { answer, citations, nextIndex: i }
+  return { answer, citations, suggestedAction, nextIndex: i }
 }
 
 export function parseReplyDocument(
@@ -151,6 +159,7 @@ export function parseReplyDocument(
   const body = parseReplyBody(lines, startIndex + 1, row.indent, issues)
   if (body.answer !== undefined) answer = body.answer
   citations = body.citations
+  const suggestedAction = body.suggestedAction
 
   if (!answer) {
     issues.push(eqlSyntaxIssue(row.line, "REPLY requires ANSWER"))
@@ -162,5 +171,6 @@ export function parseReplyDocument(
     header,
     answer,
     citations,
+    ...(suggestedAction ? { suggestedAction } : {}),
   }
 }

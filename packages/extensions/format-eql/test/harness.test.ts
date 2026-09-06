@@ -157,4 +157,25 @@ describe("EQL @executioncontrolprotocol.harness.reply", () => {
       answer: "Hello",
     })
   })
+
+  it("round-trips ACTION offer-run", () => {
+    const withAction: HarnessReply = {
+      schema: ECP_HARNESS_REPLY_SCHEMA,
+      answer: "I added a summarize step. Want me to run it?",
+      suggestedAction: "offer-run",
+    }
+    const encoded = encodeToEql(
+      { source: withAction, sourceSchema: ECP_HARNESS_REPLY_SCHEMA },
+      testCtx
+    )
+    expect(encoded.success).toBe(true)
+    expect(encoded.result).toContain("ACTION offer-run")
+
+    const decoded = decodeFromEql(
+      { input: encoded.result, targetSchema: ECP_HARNESS_REPLY_SCHEMA },
+      testCtx
+    )
+    expect(decoded.success).toBe(true)
+    expect(decoded.result).toEqual(withAction)
+  })
 })

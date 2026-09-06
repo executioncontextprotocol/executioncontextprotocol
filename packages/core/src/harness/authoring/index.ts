@@ -91,6 +91,8 @@ export {
 export {
   answerRedirectsToHarnessScope,
   buildAssistantSafeReply,
+  buildAuthoringFailureReply,
+  tryBuildChangeSummaryReply,
   tryBuildRunContextReply,
   tryBuildFaqReply,
   tryBuildEnvironmentReply,
@@ -100,3 +102,8 @@ export {
   HARNESS_ASSISTANT_SAFE_REPLY_MESSAGE,
   HARNESS_ASSISTANT_SCOPE_REDIRECT_PHRASE,
 } from "./safe-reply.js"
+export {
+  chatResultAnswer,
+  chatResultWorkflow,
+  chatResultSuggestedAction,
+} from "./chat-result.js"

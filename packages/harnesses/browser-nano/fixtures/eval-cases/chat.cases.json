@@ -3,7 +3,7 @@
     {
       "id": "chat-01",
       "suite": "chat",
-      "title": "Troubleshoot failure routes to patch",
+      "title": "Troubleshoot failure routes to patch with summary",
       "harness": "chat",
       "model": "default",
       "input": {
@@ -12,40 +12,29 @@
       },
       "assertions": {
         "deterministic": [
-          {
-            "kind": "invokeSuccess"
-          },
-          {
-            "kind": "classifiedIntent",
-            "value": "workflow-patch"
-          },
-          {
-            "kind": "shotCount",
-            "value": 2
-          },
-          {
-            "kind": "promptPhase",
-            "shotIndex": 0,
-            "value": "unfiltered"
-          },
-          {
-            "kind": "promptPhase",
-            "shotIndex": 1,
-            "value": "contextualized"
-          },
-          {
-            "kind": "validationValid"
-          }
+          { "kind": "invokeSuccess" },
+          { "kind": "classifiedIntent", "value": "workflow-patch" },
+          { "kind": "shotCount", "value": 3 },
+          { "kind": "promptPhase", "shotIndex": 0, "value": "unfiltered" },
+          { "kind": "promptPhase", "shotIndex": 1, "value": "contextualized" },
+          { "kind": "shotTask", "shotIndex": 2, "task": "workflow-change-summary" },
+          { "kind": "replySchema" },
+          { "kind": "replyAction", "value": "offer-run" },
+          { "kind": "sidecarWorkflowSchema", "value": "@executioncontrolprotocol.workflow" },
+          { "kind": "validationValid" }
         ],
         "judge": {
-          "enabled": false
+          "enabled": true,
+          "goal": "Summarizes the workflow fix and asks whether to run it",
+          "rubric": "One or two sentences about the change; asks to run; no markdown fences",
+          "requireApproved": true
         }
       }
     },
     {
       "id": "chat-02",
       "suite": "chat",
-      "title": "Create routing",
+      "title": "Create routing with change summary",
       "harness": "chat",
       "model": "default",
       "input": {
@@ -53,24 +42,21 @@
       },
       "assertions": {
         "deterministic": [
-          {
-            "kind": "invokeSuccess"
-          },
-          {
-            "kind": "classifiedIntent",
-            "value": "workflow-create"
-          },
-          {
-            "kind": "shotCount",
-            "value": 2
-          },
-          {
-            "kind": "artifactSchema",
-            "value": "@executioncontrolprotocol.workflow"
-          }
+          { "kind": "invokeSuccess" },
+          { "kind": "classifiedIntent", "value": "workflow-create" },
+          { "kind": "shotCount", "value": 3 },
+          { "kind": "shotTask", "shotIndex": 1, "task": "workflow-authoring" },
+          { "kind": "shotTask", "shotIndex": 2, "task": "workflow-change-summary" },
+          { "kind": "replySchema" },
+          { "kind": "replyAction", "value": "offer-run" },
+          { "kind": "sidecarWorkflowSchema", "value": "@executioncontrolprotocol.workflow" },
+          { "kind": "sidecarStepUses", "capabilityId": "@executioncontrolprotocol/test.echo" }
         ],
         "judge": {
-          "enabled": false
+          "enabled": true,
+          "goal": "Summarizes creating echo/summarize workflow and asks to run",
+          "rubric": "Mentions the created steps and asks to run; no markdown fences",
+          "requireApproved": true
         }
       }
     },
@@ -85,24 +71,12 @@
       },
       "assertions": {
         "deterministic": [
-          {
-            "kind": "invokeSuccess"
-          },
-          {
-            "kind": "classifiedIntent",
-            "value": "faq"
-          },
-          {
-            "kind": "classifiedTopic",
-            "contains": "patch"
-          },
-          {
-            "kind": "shotCount",
-            "value": 2
-          },
-          {
-            "kind": "replySchema"
-          }
+          { "kind": "invokeSuccess" },
+          { "kind": "classifiedIntent", "value": "faq" },
+          { "kind": "classifiedTopic", "contains": "patch" },
+          { "kind": "shotCount", "value": 2 },
+          { "kind": "replySchema" },
+          { "kind": "replyActionAbsent" }
         ],
         "judge": {
           "enabled": true,
@@ -123,20 +97,12 @@
       },
       "assertions": {
         "deterministic": [
-          {
-            "kind": "invokeSuccess"
-          },
-          {
-            "kind": "classifiedIntent",
-            "value": "faq"
-          },
-          {
-            "kind": "replySchema"
-          },
-          {
-            "kind": "answerContains",
-            "text": "ECP"
-          }
+          { "kind": "invokeSuccess" },
+          { "kind": "classifiedIntent", "value": "faq" },
+          { "kind": "shotCount", "value": 2 },
+          { "kind": "replySchema" },
+          { "kind": "replyActionAbsent" },
+          { "kind": "answerContains", "text": "ECP" }
         ],
         "judge": {
           "enabled": true,
@@ -158,20 +124,12 @@
       },
       "assertions": {
         "deterministic": [
-          {
-            "kind": "invokeSuccess"
-          },
-          {
-            "kind": "classifiedIntent",
-            "value": "general"
-          },
-          {
-            "kind": "replySchema"
-          },
-          {
-            "kind": "answerContains",
-            "text": "ecp"
-          }
+          { "kind": "invokeSuccess" },
+          { "kind": "classifiedIntent", "value": "general" },
+          { "kind": "shotCount", "value": 2 },
+          { "kind": "replySchema" },
+          { "kind": "replyActionAbsent" },
+          { "kind": "answerContains", "text": "ecp" }
         ],
         "judge": {
           "enabled": true,
@@ -184,7 +142,7 @@
     {
       "id": "chat-06",
       "suite": "chat",
-      "title": "Patch label change",
+      "title": "Patch label change with summary",
       "harness": "chat",
       "model": "default",
       "input": {
@@ -193,19 +151,20 @@
       },
       "assertions": {
         "deterministic": [
-          {
-            "kind": "invokeSuccess"
-          },
-          {
-            "kind": "classifiedIntent",
-            "value": "workflow-patch"
-          },
-          {
-            "kind": "validationValid"
-          }
+          { "kind": "invokeSuccess" },
+          { "kind": "classifiedIntent", "value": "workflow-patch" },
+          { "kind": "shotCount", "value": 3 },
+          { "kind": "replySchema" },
+          { "kind": "replyAction", "value": "offer-run" },
+          { "kind": "sidecarWorkflowSchema", "value": "@executioncontrolprotocol.workflow" },
+          { "kind": "sidecarStepLabel", "stepId": "echo", "value": "Patched Echo" },
+          { "kind": "validationValid" }
         ],
         "judge": {
-          "enabled": false
+          "enabled": true,
+          "goal": "Summarizes the echo label change and asks to run",
+          "rubric": "Mentions Patched Echo or label update; asks to run",
+          "requireApproved": true
         }
       }
     },
@@ -220,20 +179,12 @@
       },
       "assertions": {
         "deterministic": [
-          {
-            "kind": "invokeSuccess"
-          },
-          {
-            "kind": "classifiedIntent",
-            "value": "general"
-          },
-          {
-            "kind": "replySchema"
-          },
-          {
-            "kind": "answerContains",
-            "text": "workflow"
-          }
+          { "kind": "invokeSuccess" },
+          { "kind": "classifiedIntent", "value": "general" },
+          { "kind": "shotCount", "value": 2 },
+          { "kind": "replySchema" },
+          { "kind": "replyActionAbsent" },
+          { "kind": "answerContains", "text": "workflow" }
         ],
         "judge": {
           "enabled": true,
@@ -254,23 +205,13 @@
       },
       "assertions": {
         "deterministic": [
-          {
-            "kind": "invokeSuccess"
-          },
-          {
-            "kind": "classifiedIntent",
-            "value": "general"
-          },
-          {
-            "kind": "classifiedTopic",
-            "contains": "off-topic"
-          },
-          {
-            "kind": "replySchema"
-          },
-          {
-            "kind": "answerRedirectsToScope"
-          }
+          { "kind": "invokeSuccess" },
+          { "kind": "classifiedIntent", "value": "general" },
+          { "kind": "classifiedTopic", "contains": "off-topic" },
+          { "kind": "shotCount", "value": 2 },
+          { "kind": "replySchema" },
+          { "kind": "replyActionAbsent" },
+          { "kind": "answerRedirectsToScope" }
         ],
         "judge": {
           "enabled": true,
@@ -293,26 +234,68 @@
       },
       "assertions": {
         "deterministic": [
-          {
-            "kind": "invokeSuccess"
-          },
-          {
-            "kind": "shotCount",
-            "value": 2
-          },
-          {
-            "kind": "replySchema"
-          },
-          {
-            "kind": "answerContains",
-            "text": "fail"
-          }
+          { "kind": "invokeSuccess" },
+          { "kind": "shotCount", "value": 2 },
+          { "kind": "replySchema" },
+          { "kind": "replyActionAbsent" },
+          { "kind": "answerContains", "text": "fail" }
         ],
         "judge": {
           "enabled": true,
           "goal": "Reports failed run status",
           "rubric": "Mentions failed status from run context",
           "requireApproved": true
+        }
+      }
+    },
+    {
+      "id": "chat-10",
+      "suite": "chat",
+      "title": "Fix failed run with patch summary",
+      "harness": "chat",
+      "model": "default",
+      "input": {
+        "message": "The last workflow run failed. Diagnose the errors from the run context and patch the workflow to fix them.",
+        "manifestRef": "workflows/echo-workflow.json",
+        "runContextFixture": "runs/failed-echo-step.json"
+      },
+      "assertions": {
+        "deterministic": [
+          { "kind": "invokeSuccess" },
+          { "kind": "classifiedIntent", "value": "workflow-patch" },
+          { "kind": "shotCount", "value": 3 },
+          { "kind": "replySchema" },
+          { "kind": "replyAction", "value": "offer-run" },
+          { "kind": "sidecarWorkflowSchema", "value": "@executioncontrolprotocol.workflow" },
+          { "kind": "answerContains", "text": "run" }
+        ],
+        "judge": {
+          "enabled": true,
+          "goal": "Summarizes a fix for the failed echo run and asks to run again",
+          "rubric": "Mentions a fix or update; asks to run; no markdown fences",
+          "requireApproved": true
+        }
+      }
+    },
+    {
+      "id": "chat-11",
+      "suite": "chat",
+      "title": "Gibberish stays assistant without offer-run",
+      "harness": "chat",
+      "model": "default",
+      "input": {
+        "message": "asdf qwerty ???",
+        "manifestRef": "workflows/echo-workflow.json"
+      },
+      "assertions": {
+        "deterministic": [
+          { "kind": "invokeSuccess" },
+          { "kind": "shotCount", "value": 2 },
+          { "kind": "replySchema" },
+          { "kind": "replyActionAbsent" }
+        ],
+        "judge": {
+          "enabled": false
         }
       }
     }

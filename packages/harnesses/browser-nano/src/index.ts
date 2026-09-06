@@ -28,8 +28,10 @@ export type { BrowserNanoHarnessInput } from "./browser-nano-harness.js"
 export {
   chatResultAnswer,
   chatResultWorkflow,
+  chatResultSuggestedAction,
   intentRoutesToAuthoring,
   invokeMultiShotChat,
+  WORKFLOW_CHANGE_SUMMARY_SHOT_TASK,
 } from "./multi-shot-chat.js"
 
 export {

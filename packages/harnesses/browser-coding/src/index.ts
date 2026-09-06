@@ -20,6 +20,7 @@ export type { BrowserCodingHarnessInput } from "./browser-coding-harness.js"
 export {
   chatResultAnswer,
   chatResultWorkflow,
+  chatResultSuggestedAction,
   invokeMultiShotChatCoding,
 } from "./multi-shot-chat.js"
 export {

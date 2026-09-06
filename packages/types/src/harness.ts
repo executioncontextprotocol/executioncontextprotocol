@@ -102,6 +102,11 @@ export const harnessEvaluateOutputSchema = z.object({
   raw: z.string(),
   /** Validation result when enabled. */
   validation: z.unknown().optional(),
+  /**
+   * Optional authored workflow sidecar when the primary artifact is a conversational reply
+   * (multi-shot chat create/patch last shot).
+   */
+  workflow: z.unknown().optional(),
   /** Execution trace. */
   trace: z.custom<HarnessTrace>(
     (value) => typeof value === "object" && value !== null && "harness" in value
@@ -119,6 +124,11 @@ export interface HarnessInvokeResult<TArtifact = unknown> {
   raw: string
   /** Validation result when enabled. */
   validation?: ValidationResult
+  /**
+   * Optional authored workflow sidecar when the primary artifact is a conversational reply
+   * (multi-shot chat create/patch last shot).
+   */
+  workflow?: unknown
   /** Execution trace. */
   trace: HarnessTrace
   /** Provider usage summary. */

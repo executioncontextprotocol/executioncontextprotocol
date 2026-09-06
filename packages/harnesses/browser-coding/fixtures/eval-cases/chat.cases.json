@@ -1,0 +1,123 @@
+{
+  "cases": [
+    {
+      "id": "coding-chat-01",
+      "suite": "chat",
+      "title": "Create routing with change summary",
+      "harness": "chat",
+      "model": "default",
+      "input": {
+        "message": "I need a new workflow with echo and summarize."
+      },
+      "assertions": {
+        "deterministic": [
+          { "kind": "invokeSuccess" },
+          { "kind": "classifiedIntent", "value": "workflow-create" },
+          { "kind": "shotCount", "value": 3 },
+          { "kind": "shotTask", "shotIndex": 2, "task": "workflow-change-summary" },
+          { "kind": "replySchema" },
+          { "kind": "replyAction", "value": "offer-run" },
+          { "kind": "sidecarWorkflowSchema", "value": "@executioncontrolprotocol.workflow" }
+        ],
+        "judge": {
+          "enabled": true,
+          "goal": "Summarizes creating a workflow and asks to run",
+          "rubric": "Mentions the change and asks to run",
+          "requireApproved": true
+        }
+      }
+    },
+    {
+      "id": "coding-chat-02",
+      "suite": "chat",
+      "title": "Patch label with summary",
+      "harness": "chat",
+      "model": "default",
+      "input": {
+        "message": "Change the echo step label to Patched Echo.",
+        "manifestRef": "workflows/echo-workflow.json"
+      },
+      "assertions": {
+        "deterministic": [
+          { "kind": "invokeSuccess" },
+          { "kind": "classifiedIntent", "value": "workflow-patch" },
+          { "kind": "shotCount", "value": 3 },
+          { "kind": "replySchema" },
+          { "kind": "replyAction", "value": "offer-run" },
+          { "kind": "sidecarStepLabel", "stepId": "echo", "value": "Patched Echo" }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "coding-chat-03",
+      "suite": "chat",
+      "title": "FAQ no offer-run",
+      "harness": "chat",
+      "model": "default",
+      "input": {
+        "message": "What is ECP?"
+      },
+      "assertions": {
+        "deterministic": [
+          { "kind": "invokeSuccess" },
+          { "kind": "shotCount", "value": 2 },
+          { "kind": "replySchema" },
+          { "kind": "replyActionAbsent" },
+          { "kind": "answerContains", "text": "ECP" }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "coding-chat-04",
+      "suite": "chat",
+      "title": "Off-topic no offer-run",
+      "harness": "chat",
+      "model": "default",
+      "input": {
+        "message": "Tell me a joke."
+      },
+      "assertions": {
+        "deterministic": [
+          { "kind": "invokeSuccess" },
+          { "kind": "shotCount", "value": 2 },
+          { "kind": "replySchema" },
+          { "kind": "replyActionAbsent" },
+          { "kind": "answerRedirectsToScope" }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "coding-chat-05",
+      "suite": "chat",
+      "title": "Fix failed run with summary",
+      "harness": "chat",
+      "model": "default",
+      "input": {
+        "message": "The last workflow run failed. Diagnose the errors from the run context and patch the workflow to fix them.",
+        "manifestRef": "workflows/echo-workflow.json",
+        "runContextFixture": "runs/failed-echo-step.json"
+      },
+      "assertions": {
+        "deterministic": [
+          { "kind": "invokeSuccess" },
+          { "kind": "shotCount", "value": 3 },
+          { "kind": "replySchema" },
+          { "kind": "replyAction", "value": "offer-run" },
+          { "kind": "sidecarWorkflowSchema", "value": "@executioncontrolprotocol.workflow" }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    }
+  ]
+}

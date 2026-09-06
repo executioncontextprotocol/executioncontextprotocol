@@ -150,6 +150,8 @@ export interface EqlReplyDoc {
   header?: EqlHeader
   answer: string
   citations: EqlReplyCitation[]
+  /** Optional suggested UI action (e.g. offer-run). */
+  suggestedAction?: string
 }
 
 export type EqlDocument =
