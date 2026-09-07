@@ -106,13 +106,13 @@ export function deriveIntentTopicFallback(message: string, intent: EcpIntentValu
     return "ecp"
   }
   if (intent === "workflow-patch") {
-    if (/\becho\b/i.test(msg)) return "echo-failure"
+    if (/\b(poem|generate)\b/i.test(msg)) return "generate-failure"
     if (/\bfail/i.test(msg)) return "workflow-failure"
     if (/\b(step|label|input)\b/i.test(msg)) return "step-change"
     return "workflow-patch"
   }
   if (intent === "workflow-create") {
-    if (/\becho\b/i.test(msg)) return "echo-workflow"
+    if (/\b(generate|chrome\s*ai|poem|haiku)\b/i.test(msg)) return "generate-workflow"
     return "workflow-create"
   }
   if (/\b(joke|weather|recipe|resume|cover letter)\b/i.test(msg)) {

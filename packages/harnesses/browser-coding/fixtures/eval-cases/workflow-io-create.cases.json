@@ -3,22 +3,42 @@
     {
       "id": "wf-create-io-01",
       "suite": "workflow-create",
-      "title": "Accepts value with ref from input",
+      "title": "Accepts prompt with ref from input",
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create workflow echo-from-input that accepts a required string value run input field and wires echo step input from ref(\"value\") using @executioncontrolprotocol/test.echo."
+        "request": "Create workflow generate-from-prompt that accepts a required string prompt run input field and wires generate step input from ref(\"prompt\") using @executioncontrolprotocol/ollama.generate."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowAcceptsHasProperties", "properties": ["value"] },
-          { "kind": "workflowAcceptsRefUsed", "property": "value" },
-          { "kind": "stepUses", "capabilityId": "@executioncontrolprotocol/test.echo" }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "prompt"
+            ]
+          },
+          {
+            "kind": "workflowAcceptsRefUsed",
+            "property": "prompt"
+          },
+          {
+            "kind": "stepUses",
+            "capabilityId": "@executioncontrolprotocol/ollama.generate"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     },
     {
@@ -28,18 +48,45 @@
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create echo-from-input workflow with .accepts string value and .returns object echo before .run(); echo step uses ref(\"value\") and .as(\"echo\")."
+        "request": "Create generate-from-prompt workflow with .accepts string prompt and .returns object response before .run(); generate step uses @executioncontrolprotocol/ollama.generate with ref(\"prompt\") and .as(\"response\")."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowAcceptsHasProperties", "properties": ["value"] },
-          { "kind": "workflowReturnsHasProperties", "properties": ["echo"] },
-          { "kind": "workflowReturnsMapsAs", "property": "echo", "asKey": "echo" }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "stepUses",
+            "capabilityId": "@executioncontrolprotocol/ollama.generate"
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "prompt"
+            ]
+          },
+          {
+            "kind": "workflowReturnsHasProperties",
+            "properties": [
+              "response"
+            ]
+          },
+          {
+            "kind": "workflowReturnsMapsAs",
+            "property": "response",
+            "asKey": "response"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     },
     {
@@ -49,18 +96,42 @@
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create a two-step workflow that accepts prompt string input, echoes it with @executioncontrolprotocol/test.echo using ref(\"prompt\"), then summarizes with @executioncontrolprotocol/test.summarize from echo output."
+        "request": "Create a two-step workflow that accepts prompt string input, generates with @executioncontrolprotocol/ollama.generate using ref(\"prompt\"), then summarizes with the same capability from poem.text."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowAcceptsHasProperties", "properties": ["prompt"] },
-          { "kind": "workflowAcceptsRefUsed", "property": "prompt" },
-          { "kind": "stepCount", "min": 2 }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "prompt"
+            ]
+          },
+          {
+            "kind": "workflowAcceptsRefUsed",
+            "property": "prompt"
+          },
+          {
+            "kind": "stepCount",
+            "min": 2
+          },
+          {
+            "kind": "stepUses",
+            "capabilityId": "@executioncontrolprotocol/ollama.generate"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     },
     {
@@ -70,17 +141,35 @@
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create workflow with accepts value string, echo step as echo, and returns schema property echo matching the step as key."
+        "request": "Create workflow with accepts prompt string, @executioncontrolprotocol/ollama.generate step as response, and returns schema property response matching the step as key."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowReturnsHasProperties", "properties": ["echo"] },
-          { "kind": "workflowReturnsMapsAs", "property": "echo", "asKey": "echo" }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "workflowReturnsHasProperties",
+            "properties": [
+              "response"
+            ]
+          },
+          {
+            "kind": "workflowReturnsMapsAs",
+            "property": "response",
+            "asKey": "response"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     },
     {
@@ -90,16 +179,34 @@
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create workflow with .accepts number count field and echo step wired from ref(\"count\")."
+        "request": "Create workflow with .accepts number count field and @executioncontrolprotocol/ollama.generate step wired from ref(\"count\")."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowAcceptsHasProperties", "properties": ["count"] }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "count"
+            ]
+          },
+          {
+            "kind": "stepUses",
+            "capabilityId": "@executioncontrolprotocol/ollama.generate"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     },
     {
@@ -109,42 +216,98 @@
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create single-step echo workflow with accepts value string and no returns schema."
+        "request": "Create single-step @executioncontrolprotocol/ollama.generate workflow with accepts prompt string and no returns schema."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowAcceptsHasProperties", "properties": ["value"] },
-          { "kind": "workflowReturnsAbsent" },
-          { "kind": "stepCount", "exact": 1 }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "prompt"
+            ]
+          },
+          {
+            "kind": "workflowReturnsAbsent"
+          },
+          {
+            "kind": "stepCount",
+            "exact": 1
+          },
+          {
+            "kind": "stepUses",
+            "capabilityId": "@executioncontrolprotocol/ollama.generate"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     },
     {
       "id": "wf-create-io-07",
       "suite": "workflow-create",
-      "title": "Chrome AI generate accepts and object returns",
+      "title": "Ollama generate accepts and object returns",
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create chrome-generate-from-prompt with .accepts prompt string, one @executioncontrolprotocol/chrome-ai.generate step .as(\"response\") from ref(\"prompt\"), and .returns object response (not string)."
+        "request": "Create ollama-generate-from-prompt with .accepts prompt string, one @executioncontrolprotocol/ollama.generate step .as(\"response\") from ref(\"prompt\"), and .returns object response (not string)."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "stepUses", "capabilityId": "@executioncontrolprotocol/chrome-ai.generate" },
-          { "kind": "workflowAcceptsHasProperties", "properties": ["prompt"] },
-          { "kind": "workflowAcceptsRefUsed", "property": "prompt" },
-          { "kind": "workflowReturnsHasProperties", "properties": ["response"] },
-          { "kind": "workflowReturnsMapsAs", "property": "response", "asKey": "response" },
-          { "kind": "workflowReturnsPropertyType", "property": "response", "type": "object" }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "stepUses",
+            "capabilityId": "@executioncontrolprotocol/ollama.generate"
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "prompt"
+            ]
+          },
+          {
+            "kind": "workflowAcceptsRefUsed",
+            "property": "prompt"
+          },
+          {
+            "kind": "workflowReturnsHasProperties",
+            "properties": [
+              "response"
+            ]
+          },
+          {
+            "kind": "workflowReturnsMapsAs",
+            "property": "response",
+            "asKey": "response"
+          },
+          {
+            "kind": "workflowReturnsPropertyType",
+            "property": "response",
+            "type": "object"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     }
   ]

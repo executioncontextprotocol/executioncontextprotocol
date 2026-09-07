@@ -11,18 +11,18 @@ const nanoLoader = createNodeEvalFixturesLoader({
 })
 
 describe("loadEvalCasesFromDir", () => {
-  it("loads 96 cases across suites from harness-owned fixtures", () => {
-    expect(nanoLoader.loadEvalCases().length).toBe(96)
-    expect(nanoLoader.countEvalCases()).toBe(96)
+  it("loads 97 cases across suites from harness-owned fixtures", () => {
+    expect(nanoLoader.loadEvalCases().length).toBe(97)
+    expect(nanoLoader.countEvalCases()).toBe(97)
   })
 
   it("loads workflow-create suite", () => {
     const cases = nanoLoader.loadEvalCases({ suite: EVAL_SUITE_VALUES.WORKFLOW_CREATE })
-    expect(cases.length).toBe(18)
+    expect(cases.length).toBe(19)
   })
 
   it("loads harness run fixture", () => {
-    const ctx = nanoLoader.loadHarnessRunFixture("failed-echo-step.json")
+    const ctx = nanoLoader.loadHarnessRunFixture("failed-generate-step.json")
     expect(ctx.run.run.status).toBe("failed")
   })
 })

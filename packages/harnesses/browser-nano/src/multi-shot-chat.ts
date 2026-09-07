@@ -147,10 +147,16 @@ export async function invokeMultiShotChat(
     overrides?: Record<string, unknown>
   ): Record<string, unknown> => {
     const taskDefaults = getHarnessNanoConfig(task) as Record<string, Record<string, unknown>>
+    const chatConfig = ctx.config as Record<string, unknown>
     return {
       ...taskDefaults,
-      ...ctx.config,
-      ...overrides,
+      ...chatConfig,
+      // Chat binding config has no output schema; never let it wipe task defaults.
+      output: {
+        ...(taskDefaults.output ?? {}),
+        ...((chatConfig.output as Record<string, unknown> | undefined) ?? {}),
+        ...((overrides?.output as Record<string, unknown> | undefined) ?? {}),
+      },
       context: {
         ...taskDefaults.context,
         ...(ctx.config.context as Record<string, unknown> | undefined),
@@ -168,6 +174,9 @@ export async function invokeMultiShotChat(
         ...(ctx.config.trace as Record<string, unknown> | undefined),
         ...((overrides?.trace as Record<string, unknown> | undefined) ?? {}),
       },
+      ...(overrides?.promptFixture !== undefined
+        ? { promptFixture: overrides.promptFixture }
+        : {}),
     }
   }
 

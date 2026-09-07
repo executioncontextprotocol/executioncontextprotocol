@@ -6,9 +6,9 @@
       "title": "Label change",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/echo-workflow.json",
+      "baselineWorkflow": "workflows/two-step-generate-chain.json",
       "input": {
-        "request": "Change the echo step label to Patched Echo."
+        "request": "Change the poem step label to Draft Poem."
       },
       "assertions": {
         "deterministic": [
@@ -24,8 +24,8 @@
           },
           {
             "kind": "stepLabel",
-            "stepId": "echo",
-            "value": "Patched Echo"
+            "stepId": "poem",
+            "value": "Draft Poem"
           }
         ],
         "judge": {
@@ -39,9 +39,9 @@
       "title": "Input value",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/echo-workflow.json",
+      "baselineWorkflow": "workflows/two-step-generate-chain.json",
       "input": {
-        "request": "Set echo input value to world."
+        "request": "Set poem prompt to Write a short poem about rivers."
       },
       "assertions": {
         "deterministic": [
@@ -64,12 +64,12 @@
     {
       "id": "wf-patch-03",
       "suite": "workflow-patch",
-      "title": "Add summarize",
+      "title": "Add critique",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/echo-workflow.json",
+      "baselineWorkflow": "workflows/two-step-generate-chain.json",
       "input": {
-        "request": "Add a summarize step after echo using @executioncontrolprotocol/test.summarize."
+        "request": "Add a critique step after summarize using @executioncontrolprotocol/chrome-ai.generate."
       },
       "assertions": {
         "deterministic": [
@@ -85,7 +85,11 @@
           },
           {
             "kind": "stepCount",
-            "min": 2
+            "min": 3
+          },
+          {
+            "kind": "stepUses",
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
           }
         ],
         "judge": {
@@ -96,12 +100,12 @@
     {
       "id": "wf-patch-04",
       "suite": "workflow-patch",
-      "title": "Remove notify",
+      "title": "Remove critique",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/multi-cap-workflow.json",
+      "baselineWorkflow": "workflows/three-step-generate-workflow.json",
       "input": {
-        "request": "Remove the notify step from the workflow."
+        "request": "Remove the critique step from the workflow."
       },
       "assertions": {
         "deterministic": [
@@ -117,7 +121,7 @@
           },
           {
             "kind": "stepRemoved",
-            "stepId": "notify"
+            "stepId": "critique"
           }
         ],
         "judge": {
@@ -131,9 +135,9 @@
       "title": "Workflow label",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/two-step-chain.json",
+      "baselineWorkflow": "workflows/two-step-generate-chain.json",
       "input": {
-        "request": "Change workflow label to Updated Chain."
+        "request": "Change workflow label to Updated Poem Chain."
       },
       "assertions": {
         "deterministic": [
@@ -149,7 +153,7 @@
           },
           {
             "kind": "workflowLabel",
-            "value": "Updated Chain"
+            "value": "Updated Poem Chain"
           }
         ],
         "judge": {
@@ -163,7 +167,7 @@
       "title": "Step config",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/two-step-chain.json",
+      "baselineWorkflow": "workflows/two-step-generate-chain.json",
       "input": {
         "request": "Change summarize step label to Short Summary."
       },
@@ -196,9 +200,9 @@
       "title": "Ref chain",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/two-step-chain.json",
+      "baselineWorkflow": "workflows/two-step-generate-chain.json",
       "input": {
-        "request": "Ensure summarize input references echo output via $ref."
+        "request": "Ensure summarize context references poem text via $ref."
       },
       "assertions": {
         "deterministic": [
@@ -225,12 +229,12 @@
     {
       "id": "wf-patch-08",
       "suite": "workflow-patch",
-      "title": "Add validate",
+      "title": "Add title",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/echo-workflow.json",
+      "baselineWorkflow": "workflows/two-step-generate-chain.json",
       "input": {
-        "request": "Insert a validate step before echo using @executioncontrolprotocol/test.validate."
+        "request": "Insert a title step before poem using @executioncontrolprotocol/chrome-ai.generate."
       },
       "assertions": {
         "deterministic": [
@@ -246,7 +250,11 @@
           },
           {
             "kind": "stepUses",
-            "capabilityId": "@executioncontrolprotocol/test.validate"
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
+          },
+          {
+            "kind": "stepCount",
+            "min": 3
           }
         ],
         "judge": {
@@ -260,9 +268,9 @@
       "title": "Combined",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/two-step-chain.json",
+      "baselineWorkflow": "workflows/two-step-generate-chain.json",
       "input": {
-        "request": "Add translate after echo and remove summarize if present."
+        "request": "Add explain after poem and remove summarize if present using @executioncontrolprotocol/chrome-ai.generate."
       },
       "assertions": {
         "deterministic": [
@@ -288,9 +296,9 @@
       "title": "Patch judge",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/echo-workflow.json",
+      "baselineWorkflow": "workflows/two-step-generate-chain.json",
       "input": {
-        "request": "Improve echo label to be user friendly."
+        "request": "Improve poem label to be user friendly."
       },
       "assertions": {
         "deterministic": [
@@ -315,12 +323,12 @@
     {
       "id": "wf-patch-11",
       "suite": "workflow-patch",
-      "title": "Translate label",
+      "title": "Rename email label",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/echo-workflow.json",
+      "baselineWorkflow": "workflows/email-action-workflow.json",
       "input": {
-        "request": "Rename echo label to Translated Output."
+        "request": "Rename the email step label to Draft Meeting Email."
       },
       "assertions": {
         "deterministic": [
@@ -333,6 +341,11 @@
           },
           {
             "kind": "validationValid"
+          },
+          {
+            "kind": "stepLabel",
+            "stepId": "email",
+            "value": "Draft Meeting Email"
           }
         ],
         "judge": {
@@ -343,12 +356,12 @@
     {
       "id": "wf-patch-12",
       "suite": "workflow-patch",
-      "title": "Move echo",
+      "title": "Move summarize",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/echo-validate-reorder.json",
+      "baselineWorkflow": "workflows/two-step-generate-chain.json",
       "input": {
-        "request": "Move the echo step to run after validate."
+        "request": "Move the summarize step to run after poem."
       },
       "assertions": {
         "deterministic": [
@@ -365,8 +378,8 @@
           {
             "kind": "stepOrder",
             "stepIds": [
-              "validate",
-              "echo"
+              "poem",
+              "summarize"
             ]
           }
         ],

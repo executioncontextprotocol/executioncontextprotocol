@@ -6,52 +6,36 @@
   "promptFormat": "eql",
   "fewShots": [
     {
-      "message": "Create a minimal @executioncontrolprotocol.workflow with one step id echo using @executioncontrolprotocol/test.echo and input value hello.",
-      "output": "WORKFLOW minimal-echo \"Minimal Echo\"\nSTEP echo USES @executioncontrolprotocol/test.echo\n  LABEL \"Echo\"\n  WITH value = \"hello\"\n  AS echo"
-    },
-    {
-      "message": "Create a workflow with echo (@executioncontrolprotocol/test.echo) then summarize (@executioncontrolprotocol/test.summarize) passing echo output.",
-      "output": "WORKFLOW echo-summarize \"Echo summarize\"\nSTEP echo USES @executioncontrolprotocol/test.echo\n  LABEL \"Echo\"\n  WITH value = \"hello\"\n  AS echo\nSTEP summarize USES @executioncontrolprotocol/test.summarize\n  LABEL \"Summarize\"\n  WITH payload = REF echo.output\n  AS summary"
-    },
-    {
-      "message": "Build a workflow: first @executioncontrolprotocol/test.validate then @executioncontrolprotocol/test.echo.",
-      "output": "WORKFLOW validate-echo \"Validate then echo\"\nSTEP validate USES @executioncontrolprotocol/test.validate\n  LABEL \"Validate\"\n  WITH payload = {\"ok\": true}\n  AS validated\nSTEP echo USES @executioncontrolprotocol/test.echo\n  LABEL \"Echo\"\n  WITH value = \"hello\"\n  AS echo"
-    },
-    {
-      "message": "Create a two-step workflow using @executioncontrolprotocol/test.echo and @executioncontrolprotocol/test.translate.",
-      "output": "WORKFLOW two-step-translate \"Echo translate\"\nSTEP echo USES @executioncontrolprotocol/test.echo\n  LABEL \"Echo\"\n  WITH value = \"hello\"\n  AS echo\nSTEP translate USES @executioncontrolprotocol/test.translate\n  LABEL \"Translate\"\n  WITH text = REF echo.output\n  AS translated"
-    },
-    {
-      "message": "Create workflow with @executioncontrolprotocol/test.echo and a final @executioncontrolprotocol/test.notify step.",
-      "output": "WORKFLOW echo-notify \"Echo and notify\"\nSTEP echo USES @executioncontrolprotocol/test.echo\n  LABEL \"Echo\"\n  WITH value = \"hello\"\n  AS echo\nSTEP notify USES @executioncontrolprotocol/test.notify\n  LABEL \"Notify\"\n  WITH payload = REF echo.output\n  AS notified"
-    },
-    {
-      "message": "Create a 3-step workflow using @executioncontrolprotocol/test.validate, @executioncontrolprotocol/test.echo, and @executioncontrolprotocol/test.summarize.",
-      "output": "WORKFLOW triple-chain \"Validate echo summarize\"\nSTEP validate USES @executioncontrolprotocol/test.validate\n  LABEL \"Validate\"\n  WITH payload = {\"ok\": true}\n  AS validated\nSTEP echo USES @executioncontrolprotocol/test.echo\n  LABEL \"Echo\"\n  WITH value = \"hello\"\n  AS echo\nSTEP summarize USES @executioncontrolprotocol/test.summarize\n  LABEL \"Summarize\"\n  WITH payload = REF echo.output\n  AS summary"
-    },
-    {
       "message": "Create a workflow with one step that uses @executioncontrolprotocol/chrome-ai.generate to summarize the text hello in one sentence.",
       "output": "WORKFLOW chrome-summarize \"Chrome summarize\"\nSTEP summarize USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Summarize\"\n  WITH prompt = \"Summarize in one sentence: hello\"\n  AS summary"
     },
     {
-      "message": "Create a two-step workflow: echo with @executioncontrolprotocol/test.echo then summarize the echo output with @executioncontrolprotocol/chrome-ai.generate.",
-      "output": "WORKFLOW echo-chrome-summarize \"Echo then chrome summarize\"\nSTEP echo USES @executioncontrolprotocol/test.echo\n  LABEL \"Echo\"\n  WITH value = \"hello\"\n  AS echo\nSTEP summarize USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Summarize\"\n  WITH prompt = \"Summarize the echoed text in one sentence.\"\n  WITH context = REF echo.echo\n  AS summary"
+      "message": "Create chrome-generate-from-prompt with ACCEPTS prompt:string!, one @executioncontrolprotocol/chrome-ai.generate step AS response wired from REF prompt, and RETURNS OUT response:object!.",
+      "output": "WORKFLOW chrome-generate-from-prompt \"Chrome generate from prompt\"\nACCEPTS\n  WITH prompt:string!\nRETURNS\n  OUT response:object!\nSTEP generate USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Generate\"\n  WITH prompt = REF prompt\n  AS response"
     },
     {
       "message": "Create a two-step workflow: generate a short poem with @executioncontrolprotocol/chrome-ai.generate, then summarize that poem with the same capability.",
       "output": "WORKFLOW poem-summarize \"Poem Summarization\"\nSTEP poem USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Generate Poem\"\n  WITH prompt = \"Write a short poem about the ocean.\"\n  AS poem\nSTEP summarize USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Summarize Poem\"\n  WITH prompt = \"Summarize the following poem:\"\n  WITH context = REF poem.text\n  AS summary"
     },
     {
-      "message": "Build a workflow that uses Chrome AI to generate a short email, then extract key action items from it in a second step.",
-      "output": "WORKFLOW email-action \"Email Action\"\nSTEP email USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Generate Email\"\n  WITH prompt = \"Generate a short professional email summarizing the following text.\"\n  AS email\nSTEP actions USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Extract Action Items\"\n  WITH prompt = \"Extract the key action items from the following email:\"\n  WITH context = REF email.text\n  AS actions"
+      "message": "Build a workflow that uses Chrome AI to generate a short sample email with a meeting summary, then extract key action items from it in a second step.",
+      "output": "WORKFLOW email-action \"Email Action\"\nSTEP email USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Generate Email\"\n  WITH prompt = \"Generate a short sample email with a meeting summary.\"\n  AS email\nSTEP actions USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Extract Action Items\"\n  WITH prompt = \"Extract the key action items from the following email:\"\n  WITH context = REF email.text\n  AS actions"
     },
     {
-      "message": "Create echo-from-input with ACCEPTS value:string! and echo wired from REF value.",
-      "output": "WORKFLOW echo-from-input \"Echo from input\"\nACCEPTS\n  WITH value:string!\nRETURNS\n  OUT echo:object!\nSTEP echo USES @executioncontrolprotocol/test.echo\n  LABEL \"Echo\"\n  WITH value = REF value\n  AS echo"
+      "message": "Create a two-step workflow: Chrome AI writes a haiku, then Chrome AI explains what it means.",
+      "output": "WORKFLOW haiku-explain \"Haiku Explain\"\nSTEP haiku USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Write Haiku\"\n  WITH prompt = \"Write a haiku.\"\n  AS haiku\nSTEP explain USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Explain Haiku\"\n  WITH prompt = \"Explain what the following haiku means:\"\n  WITH context = REF haiku.text\n  AS explain"
     },
     {
-      "message": "Create chrome-generate-from-prompt with ACCEPTS prompt:string!, one @executioncontrolprotocol/chrome-ai.generate step AS response wired from REF prompt, and RETURNS OUT response:object!.",
-      "output": "WORKFLOW chrome-generate-from-prompt \"Chrome generate from prompt\"\nACCEPTS\n  WITH prompt:string!\nRETURNS\n  OUT response:object!\nSTEP generate USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Generate\"\n  WITH prompt = REF prompt\n  AS response"
+      "message": "Build a three-step Chrome AI workflow: ask a trivia question, draft an answer, then critique the answer.",
+      "output": "WORKFLOW trivia-critique \"Trivia Critique\"\nSTEP question USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Ask Trivia Question\"\n  WITH prompt = \"Ask a trivia question.\"\n  AS question\nSTEP answer USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Draft Answer\"\n  WITH prompt = \"Draft an answer to the following trivia question:\"\n  WITH context = REF question.text\n  AS answer\nSTEP critique USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Critique Answer\"\n  WITH prompt = \"Critique the following trivia answer:\"\n  WITH context = REF answer.text\n  AS critique"
+    },
+    {
+      "message": "Create email-from-notes with ACCEPTS notes:string!, one @executioncontrolprotocol/chrome-ai.generate step AS email from REF notes, a second generate step AS actions with REF email.text, and RETURNS OUT email:object! OUT actions:object!.",
+      "output": "WORKFLOW email-from-notes \"Email from notes\"\nACCEPTS\n  WITH notes:string!\nRETURNS\n  OUT email:object!\n  OUT actions:object!\nSTEP email USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Generate Email\"\n  WITH prompt = \"Generate a short sample email with a meeting summary from these notes:\"\n  WITH context = REF notes\n  AS email\nSTEP actions USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Extract Action Items\"\n  WITH prompt = \"Extract the key action items from the following email:\"\n  WITH context = REF email.text\n  AS actions"
+    },
+    {
+      "message": "Create a minimal one-step Chrome AI workflow that drafts a short meeting agenda.",
+      "output": "WORKFLOW meeting-agenda \"Meeting Agenda\"\nSTEP agenda USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Draft Agenda\"\n  WITH prompt = \"Draft a short meeting agenda.\"\n  AS agenda"
     }
   ],
   "repairHint": "Return corrected @executioncontrolprotocol.workflow EQL only. Output exactly one WORKFLOW block. Every STEP USES must match a capability id named in the user request. When the request names multiple capabilities, output one STEP per capability in order. When the request asks for one or minimal step, output exactly ONE STEP line. Every STEP must have a unique short step id; when reusing the same USES capability twice, use distinct ids (poem, summarize) — never repeat the capability suffix."

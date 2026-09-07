@@ -1,0 +1,33 @@
+{
+  "schema": "@executioncontrolprotocol.workflow",
+  "version": "1.0",
+  "workflow": {
+    "id": "email-action",
+    "label": "Email Action"
+  },
+  "steps": [
+    {
+      "type": "step",
+      "id": "email",
+      "label": "Generate Email",
+      "uses": "@executioncontrolprotocol/chrome-ai.generate",
+      "input": {
+        "prompt": "Generate a short sample email with a meeting summary."
+      },
+      "as": "email"
+    },
+    {
+      "type": "step",
+      "id": "actions",
+      "label": "Extract Action Items",
+      "uses": "@executioncontrolprotocol/chrome-ai.generate",
+      "input": {
+        "prompt": "Extract the key action items from the following email:",
+        "context": {
+          "$ref": "state.email.text"
+        }
+      },
+      "as": "actions"
+    }
+  ]
+}

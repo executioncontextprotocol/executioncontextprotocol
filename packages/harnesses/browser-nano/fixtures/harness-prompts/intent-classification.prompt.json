@@ -28,12 +28,12 @@
   ],
   "fewShots": [
     {
-      "message": "I need a new workflow with echo and summarize.",
-      "output": "INTENT workflow-create TOPIC echo-workflow SUMMARY \"User wants a new workflow with echo and summarize steps\""
+      "message": "I need a new workflow with Chrome AI generate and summarize.",
+      "output": "INTENT workflow-create TOPIC generate-workflow SUMMARY \"User wants a new workflow with generate and summarize steps\""
     },
     {
-      "message": "The workflow failed on echo, help me fix it.",
-      "output": "INTENT workflow-patch TOPIC echo-failure SUMMARY \"User reports echo step failure and wants a fix\""
+      "message": "The workflow failed on poem, help me fix it.",
+      "output": "INTENT workflow-patch TOPIC generate-failure SUMMARY \"User reports poem generate step failure and wants a fix\""
     },
     {
       "message": "What is ECP?",

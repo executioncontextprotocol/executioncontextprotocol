@@ -182,15 +182,15 @@ function formatExtensionList(summary: CompactEnvironmentSummary): string {
 }
 
 function formatStepCapabilityList(summary: CompactEnvironmentSummary): string {
-  const ids = summary.capabilities
-    .filter(
-      (cap) =>
-        cap.id.startsWith("@executioncontrolprotocol/test.") &&
-        cap.id !== "@executioncontrolprotocol/test.generate"
-    )
+  const generateIds = summary.capabilities
+    .filter((cap) => cap.id.endsWith(".generate"))
     .map((cap) => cap.id)
+  const ids =
+    generateIds.length > 0
+      ? generateIds
+      : summary.capabilities.map((cap) => cap.id)
   if (ids.length === 0) {
-    return "@executioncontrolprotocol/test.echo"
+    return "@executioncontrolprotocol/chrome-ai.generate"
   }
   if (ids.length <= 1) {
     return ids[0]!

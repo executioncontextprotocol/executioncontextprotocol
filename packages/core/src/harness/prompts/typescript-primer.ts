@@ -16,20 +16,29 @@ export const reply: HarnessReply = {
 
 const WORKFLOW_TEMPLATE = `import { workflow, step, ref } from "@executioncontrolprotocol/core"
 
-export default workflow("Echo from input")
-  .id("echo-from-input")
+export default workflow("Chrome generate from prompt")
+  .id("chrome-generate-from-prompt")
   .accepts({
     type: "object",
-    properties: { value: { type: "string" } },
-    required: ["value"],
+    properties: { prompt: { type: "string" } },
+    required: ["prompt"],
   })
   .returns({
     type: "object",
-    properties: { echo: { type: "object" } },
-    required: ["echo"],
+    properties: {
+      response: {
+        type: "object",
+        properties: { text: { type: "string" } },
+        required: ["text"],
+      },
+    },
+    required: ["response"],
   })
   .run([
-    step("@executioncontrolprotocol/test.echo", "Echo").id("echo").with({ value: ref("value") }).as("echo"),
+    step("@executioncontrolprotocol/chrome-ai.generate", "Generate")
+      .id("generate")
+      .with({ prompt: ref("prompt") })
+      .as("response"),
   ])`
 
 /**

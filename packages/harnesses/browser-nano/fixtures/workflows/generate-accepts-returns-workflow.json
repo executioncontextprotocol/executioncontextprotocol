@@ -1,0 +1,44 @@
+{
+  "schema": "@executioncontrolprotocol.workflow",
+  "version": "1.0",
+  "workflow": {
+    "id": "generate-from-prompt",
+    "label": "Generate from prompt",
+    "accepts": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "prompt"
+      ]
+    },
+    "returns": {
+      "type": "object",
+      "properties": {
+        "response": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "response"
+      ]
+    }
+  },
+  "steps": [
+    {
+      "type": "step",
+      "id": "generate",
+      "label": "Generate",
+      "uses": "@executioncontrolprotocol/chrome-ai.generate",
+      "input": {
+        "prompt": {
+          "$ref": "state.prompt"
+        }
+      },
+      "as": "response"
+    }
+  ]
+}

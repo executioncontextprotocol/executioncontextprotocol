@@ -6,56 +6,56 @@
   "promptFormat": "typescript",
   "fewShots": [
     {
-      "message": "Change the echo step label to Patched Echo.",
-      "output": "import { workflow, step } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Echo test\")\n  .id(\"echo-test\")\n  .run([\n    step(\"@executioncontrolprotocol/test.echo\", \"Patched Echo\")\n      .id(\"echo\")\n      .with({ value: \"hello from fluent API\" })\n      .as(\"echo\"),\n  ])"
+      "message": "Change the poem step label to Draft Poem.",
+      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Poem Summarization\")\n  .id(\"poem-summarize\")\n  .run([\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Draft Poem\")\n      .id(\"poem\")\n      .with({ prompt: \"Write a short poem about the ocean.\" })\n      .as(\"poem\"),\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Summarize Poem\")\n      .id(\"summarize\")\n      .with({ prompt: \"Summarize the following poem:\", context: ref(\"poem.text\") })\n      .as(\"summary\"),\n  ])"
     },
     {
-      "message": "Add a summarize step after echo using @executioncontrolprotocol/test.summarize.",
-      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Echo test\")\n  .id(\"echo-test\")\n  .run([\n    step(\"@executioncontrolprotocol/test.echo\", \"Echo\")\n      .id(\"echo\")\n      .with({ value: \"hello from fluent API\" })\n      .as(\"echo\"),\n    step(\"@executioncontrolprotocol/test.summarize\", \"Summarize\")\n      .id(\"summarize\")\n      .with({ payload: ref(\"echo.output\") })\n      .as(\"summary\"),\n  ])"
+      "message": "Add a critique step after summarize using @executioncontrolprotocol/chrome-ai.generate.",
+      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Poem Summarization\")\n  .id(\"poem-summarize\")\n  .run([\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Generate Poem\")\n      .id(\"poem\")\n      .with({ prompt: \"Write a short poem about the ocean.\" })\n      .as(\"poem\"),\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Summarize Poem\")\n      .id(\"summarize\")\n      .with({ prompt: \"Summarize the following poem:\", context: ref(\"poem.text\") })\n      .as(\"summary\"),\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Critique Summary\")\n      .id(\"critique\")\n      .with({\n        prompt: \"Critique the following poem summary:\",\n        context: ref(\"summary.text\"),\n      })\n      .as(\"critique\"),\n  ])"
     },
     {
-      "message": "Remove the notify step from the workflow.",
-      "output": "import { workflow, step } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Multi capability\")\n  .id(\"multi-cap\")\n  .run([\n    step(\"@executioncontrolprotocol/test.validate\", \"Validate\")\n      .id(\"validate\")\n      .with({ payload: { ok: true } })\n      .as(\"validated\"),\n    step(\"@executioncontrolprotocol/test.echo\", \"Echo\")\n      .id(\"echo\")\n      .with({ value: \"after-validate\" })\n      .as(\"echo\"),\n  ])"
+      "message": "Remove the critique step from the workflow.",
+      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Trivia Critique\")\n  .id(\"trivia-critique\")\n  .run([\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Ask Trivia Question\")\n      .id(\"question\")\n      .with({ prompt: \"Ask a trivia question.\" })\n      .as(\"question\"),\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Draft Answer\")\n      .id(\"answer\")\n      .with({\n        prompt: \"Draft an answer to the following trivia question:\",\n        context: ref(\"question.text\"),\n      })\n      .as(\"answer\"),\n  ])"
     },
     {
-      "message": "Change workflow label to Updated Chain.",
-      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Updated Chain\")\n  .id(\"two-step-chain\")\n  .run([\n    step(\"@executioncontrolprotocol/test.echo\", \"Echo\")\n      .id(\"echo\")\n      .with({ value: \"seed\" })\n      .as(\"echo\"),\n    step(\"@executioncontrolprotocol/test.summarize\", \"Summarize\")\n      .id(\"summarize\")\n      .with({ payload: ref(\"echo.output\") })\n      .as(\"summary\"),\n  ])"
+      "message": "Change workflow label to Updated Poem Chain.",
+      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Updated Poem Chain\")\n  .id(\"poem-summarize\")\n  .run([\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Generate Poem\")\n      .id(\"poem\")\n      .with({ prompt: \"Write a short poem about the ocean.\" })\n      .as(\"poem\"),\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Summarize Poem\")\n      .id(\"summarize\")\n      .with({ prompt: \"Summarize the following poem:\", context: ref(\"poem.text\") })\n      .as(\"summary\"),\n  ])"
     },
     {
-      "message": "Change summarize step label to Short Summary.",
-      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Two step chain\")\n  .id(\"two-step-chain\")\n  .run([\n    step(\"@executioncontrolprotocol/test.echo\", \"Echo\")\n      .id(\"echo\")\n      .with({ value: \"seed\" })\n      .as(\"echo\"),\n    step(\"@executioncontrolprotocol/test.summarize\", \"Short Summary\")\n      .id(\"summarize\")\n      .with({ payload: ref(\"echo.output\") })\n      .as(\"summary\"),\n  ])"
+      "message": "Change summarize step label to Brief Summary.",
+      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Poem Summarization\")\n  .id(\"poem-summarize\")\n  .run([\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Generate Poem\")\n      .id(\"poem\")\n      .with({ prompt: \"Write a short poem about the ocean.\" })\n      .as(\"poem\"),\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Brief Summary\")\n      .id(\"summarize\")\n      .with({ prompt: \"Summarize the following poem:\", context: ref(\"poem.text\") })\n      .as(\"summary\"),\n  ])"
     },
     {
-      "message": "Ensure summarize input references echo output via $ref.",
-      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Two step chain\")\n  .id(\"two-step-chain\")\n  .run([\n    step(\"@executioncontrolprotocol/test.echo\", \"Echo\")\n      .id(\"echo\")\n      .with({ value: \"seed\" })\n      .as(\"echo\"),\n    step(\"@executioncontrolprotocol/test.summarize\", \"Summarize\")\n      .id(\"summarize\")\n      .with({ payload: ref(\"echo.output\") })\n      .as(\"summary\"),\n  ])"
+      "message": "Ensure summarize context references poem text via ref.",
+      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Poem Summarization\")\n  .id(\"poem-summarize\")\n  .run([\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Generate Poem\")\n      .id(\"poem\")\n      .with({ prompt: \"Write a short poem about the ocean.\" })\n      .as(\"poem\"),\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Summarize Poem\")\n      .id(\"summarize\")\n      .with({ prompt: \"Summarize the following poem:\", context: ref(\"poem.text\") })\n      .as(\"summary\"),\n  ])"
     },
     {
-      "message": "Move the echo step to run after validate.",
-      "output": "import { workflow, step } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Echo validate reorder\")\n  .id(\"echo-validate\")\n  .run([\n    step(\"@executioncontrolprotocol/test.validate\", \"Validate\")\n      .id(\"validate\")\n      .with({ payload: { ok: true } })\n      .as(\"validated\"),\n    step(\"@executioncontrolprotocol/test.echo\", \"Echo\")\n      .id(\"echo\")\n      .with({ value: \"before-validate\" })\n      .as(\"echo\"),\n  ])"
+      "message": "Move the summarize step to run after poem.",
+      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Poem Summarization\")\n  .id(\"poem-summarize\")\n  .run([\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Generate Poem\")\n      .id(\"poem\")\n      .with({ prompt: \"Write a short poem about the ocean.\" })\n      .as(\"poem\"),\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Summarize Poem\")\n      .id(\"summarize\")\n      .with({ prompt: \"Summarize the following poem:\", context: ref(\"poem.text\") })\n      .as(\"summary\"),\n  ])"
     },
     {
-      "message": "Rename the echo step label to Hello Echo.",
-      "output": "import { workflow, step } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Minimal Echo\")\n  .run([step(\"@executioncontrolprotocol/test.echo\", \"Hello Echo\").id(\"echo\").with({ value: \"hello\" }).as(\"echo\")])"
+      "message": "Rename the email step label to Draft Meeting Email.",
+      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Email Action\")\n  .id(\"email-action\")\n  .run([\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Draft Meeting Email\")\n      .id(\"email\")\n      .with({ prompt: \"Generate a short sample email with a meeting summary.\" })\n      .as(\"email\"),\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Extract Action Items\")\n      .id(\"actions\")\n      .with({\n        prompt: \"Extract the key action items from the following email:\",\n        context: ref(\"email.text\"),\n      })\n      .as(\"actions\"),\n  ])"
     },
     {
-      "message": "Rename echo label to Translated Output.",
-      "output": "import { workflow, step } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Echo test\")\n  .id(\"echo-test\")\n  .run([\n    step(\"@executioncontrolprotocol/test.echo\", \"Translated Output\")\n      .id(\"echo\")\n      .with({ value: \"hello from fluent API\" })\n      .as(\"echo\"),\n  ])"
+      "message": "Rename haiku label to Draft Haiku.",
+      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Haiku Explain\")\n  .id(\"haiku-explain\")\n  .run([\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Draft Haiku\")\n      .id(\"haiku\")\n      .with({ prompt: \"Write a haiku.\" })\n      .as(\"haiku\"),\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Explain Haiku\")\n      .id(\"explain\")\n      .with({ prompt: \"Explain what the following haiku means:\", context: ref(\"haiku.text\") })\n      .as(\"explain\"),\n  ])"
     },
     {
-      "message": "Remove the notify step.",
-      "output": "import { workflow, step } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Echo and notify\")\n  .run([step(\"@executioncontrolprotocol/test.echo\", \"Echo\").id(\"echo\").with({ value: \"hello\" }).as(\"echo\")])"
+      "message": "Remove the explain step.",
+      "output": "import { workflow, step } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Haiku Explain\")\n  .id(\"haiku-explain\")\n  .run([\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Write Haiku\")\n      .id(\"haiku\")\n      .with({ prompt: \"Write a haiku.\" })\n      .as(\"haiku\"),\n  ])"
     },
     {
-      "message": "Add workflow accepts with required string value and wire echo from ref(\"value\").",
-      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Echo test\")\n  .id(\"echo-test\")\n  .accepts({ type: \"object\", properties: { value: { type: \"string\" } }, required: [\"value\"] })\n  .run([\n    step(\"@executioncontrolprotocol/test.echo\", \"Echo\")\n      .id(\"echo\")\n      .with({ value: ref(\"value\") })\n      .as(\"echo\"),\n  ])"
+      "message": "Add workflow accepts with required string topic and wire poem prompt from ref(\"topic\").",
+      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Poem Summarization\")\n  .id(\"poem-summarize\")\n  .accepts({ type: \"object\", properties: { topic: { type: \"string\" } }, required: [\"topic\"] })\n  .run([\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Generate Poem\")\n      .id(\"poem\")\n      .with({ prompt: ref(\"topic\") })\n      .as(\"poem\"),\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Summarize Poem\")\n      .id(\"summarize\")\n      .with({ prompt: \"Summarize the following poem:\", context: ref(\"poem.text\") })\n      .as(\"summary\"),\n  ])"
     },
     {
-      "message": "Add workflow returns with echo object property matching echo step as key.",
-      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Echo accepts input\")\n  .id(\"echo-accepts\")\n  .accepts({ type: \"object\", properties: { value: { type: \"string\" } }, required: [\"value\"] })\n  .returns({ type: \"object\", properties: { echo: { type: \"object\" } }, required: [\"echo\"] })\n  .run([\n    step(\"@executioncontrolprotocol/test.echo\", \"Echo\")\n      .id(\"echo\")\n      .with({ value: ref(\"value\") })\n      .as(\"echo\"),\n  ])"
+      "message": "Add workflow returns with email and actions object properties matching step as keys.",
+      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Email Action\")\n  .id(\"email-action\")\n  .returns({\n    type: \"object\",\n    properties: { email: { type: \"object\" }, actions: { type: \"object\" } },\n    required: [\"email\", \"actions\"],\n  })\n  .run([\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Generate Email\")\n      .id(\"email\")\n      .with({ prompt: \"Generate a short sample email with a meeting summary.\" })\n      .as(\"email\"),\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Extract Action Items\")\n      .id(\"actions\")\n      .with({\n        prompt: \"Extract the key action items from the following email:\",\n        context: ref(\"email.text\"),\n      })\n      .as(\"actions\"),\n  ])"
     },
     {
-      "message": "Remove workflow returns but keep accepts value.",
-      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Echo from input\")\n  .id(\"echo-from-input\")\n  .accepts({ type: \"object\", properties: { value: { type: \"string\" } }, required: [\"value\"] })\n  .run([\n    step(\"@executioncontrolprotocol/test.echo\", \"Echo\")\n      .id(\"echo\")\n      .with({ value: ref(\"value\") })\n      .as(\"echo\"),\n  ])"
+      "message": "Remove workflow returns but keep accepts prompt.",
+      "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Ollama generate from prompt\")\n  .id(\"ollama-generate-from-prompt\")\n  .accepts({ type: \"object\", properties: { prompt: { type: \"string\" } }, required: [\"prompt\"] })\n  .run([\n    step(\"@executioncontrolprotocol/ollama.generate\", \"Generate\")\n      .id(\"generate\")\n      .with({ prompt: ref(\"prompt\") })\n      .as(\"response\"),\n  ])"
     }
   ],
   "repairHint": "Return the full revised Fluent TypeScript module. Preserve all baseline step .id() values; only change what the request requires."

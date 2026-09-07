@@ -9,7 +9,7 @@
         {
           "harness": "intent-classification",
           "input": {
-            "message": "The workflow failed on echo, help me fix it."
+            "message": "The workflow failed on poem, help me fix it."
           },
           "assertions": {
             "deterministic": [
@@ -26,8 +26,8 @@
         {
           "harness": "workflow-authoring",
           "input": {
-            "request": "Set echo input value to recovered.",
-            "manifestRef": "workflows/echo-workflow.json"
+            "request": "Set poem prompt to Write a short poem about recovery.",
+            "manifestRef": "workflows/two-step-generate-chain.json"
           },
           "assertions": {
             "deterministic": [
@@ -43,8 +43,8 @@
         {
           "harness": "workflow-assistant",
           "input": {
-            "message": "Confirm the fix applies to step echo?",
-            "runContextFixture": "runs/failed-echo-step.json"
+            "message": "Confirm the fix applies to step poem?",
+            "runContextFixture": "runs/failed-generate-step.json"
           },
           "assertions": {
             "deterministic": [
@@ -54,7 +54,7 @@
             ],
             "judge": {
               "enabled": true,
-              "goal": "Confirms echo step",
+              "goal": "Confirms poem step",
               "requireApproved": true
             }
           }
@@ -70,7 +70,7 @@
         {
           "harness": "intent-classification",
           "input": {
-            "message": "I need a new workflow with echo and summarize."
+            "message": "I need a new workflow with poem then summarize using generate."
           },
           "assertions": {
             "deterministic": [
@@ -87,7 +87,7 @@
         {
           "harness": "workflow-authoring",
           "input": {
-            "request": "Create echo then @executioncontrolprotocol/test.summarize workflow."
+            "request": "Create poem then summarize workflow using @executioncontrolprotocol/chrome-ai.generate."
           },
           "assertions": {
             "deterministic": [
@@ -196,8 +196,8 @@
         {
           "harness": "workflow-authoring",
           "input": {
-            "request": "Ensure summarize uses $ref to echo output.",
-            "manifestRef": "workflows/two-step-chain.json"
+            "request": "Ensure summarize context references poem text via $ref.",
+            "manifestRef": "workflows/two-step-generate-chain.json"
           },
           "assertions": {
             "deterministic": [
@@ -258,7 +258,7 @@
         {
           "harness": "intent-classification",
           "input": {
-            "message": "Actually create an echo workflow."
+            "message": "Actually create a generate workflow."
           },
           "assertions": {
             "deterministic": [
@@ -275,13 +275,13 @@
         {
           "harness": "workflow-authoring",
           "input": {
-            "request": "Create minimal @executioncontrolprotocol/test.echo workflow."
+            "request": "Create minimal @executioncontrolprotocol/chrome-ai.generate workflow."
           },
           "assertions": {
             "deterministic": [
               {
                 "kind": "stepUses",
-                "capabilityId": "@executioncontrolprotocol/test.echo"
+                "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
               }
             ],
             "judge": {
@@ -301,7 +301,7 @@
           "harness": "workflow-assistant",
           "input": {
             "message": "What error occurred?",
-            "runContextFixture": "runs/failed-echo-step.json"
+            "runContextFixture": "runs/failed-generate-step.json"
           },
           "assertions": {
             "deterministic": [
@@ -312,8 +312,8 @@
             ],
             "judge": {
               "enabled": true,
-              "goal": "Describes echo failure",
-              "rubric": "Mentions echo and the error from the run context",
+              "goal": "Describes generate failure",
+              "rubric": "Mentions poem and the error from the run context",
               "requireApproved": true
             }
           }
@@ -321,8 +321,8 @@
         {
           "harness": "workflow-authoring",
           "input": {
-            "request": "Fix echo input to hello.",
-            "manifestRef": "workflows/echo-workflow.json"
+            "request": "Set poem prompt to Write a short poem about the ocean.",
+            "manifestRef": "workflows/two-step-generate-chain.json"
           },
           "assertions": {
             "deterministic": [
@@ -339,19 +339,19 @@
           "harness": "workflow-assistant",
           "input": {
             "message": "Where should the fix be applied?",
-            "runContextFixture": "runs/failed-echo-step.json"
+            "runContextFixture": "runs/failed-generate-step.json"
           },
           "assertions": {
             "deterministic": [
               {
                 "kind": "citationStepId",
-                "value": "echo"
+                "value": "poem"
               }
             ],
             "judge": {
               "enabled": true,
-              "goal": "Points to echo step",
-              "rubric": "Identifies step echo as where to apply the fix",
+              "goal": "Points to poem step",
+              "rubric": "Identifies step poem as where to apply the fix",
               "requireApproved": true
             }
           }
@@ -510,16 +510,32 @@
         {
           "harness": "chat",
           "input": {
-            "message": "I need a new workflow with echo and summarize."
+            "message": "I need a new workflow with poem then summarize using generate."
           },
           "assertions": {
             "deterministic": [
-              { "kind": "invokeSuccess" },
-              { "kind": "classifiedIntent", "value": "workflow-create" },
-              { "kind": "shotCount", "value": 3 },
-              { "kind": "replySchema" },
-              { "kind": "replyAction", "value": "offer-run" },
-              { "kind": "sidecarWorkflowSchema", "value": "@executioncontrolprotocol.workflow" }
+              {
+                "kind": "invokeSuccess"
+              },
+              {
+                "kind": "classifiedIntent",
+                "value": "workflow-create"
+              },
+              {
+                "kind": "shotCount",
+                "value": 3
+              },
+              {
+                "kind": "replySchema"
+              },
+              {
+                "kind": "replyAction",
+                "value": "offer-run"
+              },
+              {
+                "kind": "sidecarWorkflowSchema",
+                "value": "@executioncontrolprotocol.workflow"
+              }
             ],
             "judge": {
               "enabled": false
@@ -530,16 +546,29 @@
           "harness": "chat",
           "input": {
             "message": "The last workflow run failed. Diagnose the errors from the run context and patch the workflow to fix them.",
-            "manifestRef": "workflows/echo-workflow.json",
-            "runContextFixture": "runs/failed-echo-step.json"
+            "manifestRef": "workflows/two-step-generate-chain.json",
+            "runContextFixture": "runs/failed-generate-step.json"
           },
           "assertions": {
             "deterministic": [
-              { "kind": "invokeSuccess" },
-              { "kind": "shotCount", "value": 3 },
-              { "kind": "replySchema" },
-              { "kind": "replyAction", "value": "offer-run" },
-              { "kind": "sidecarWorkflowSchema", "value": "@executioncontrolprotocol.workflow" }
+              {
+                "kind": "invokeSuccess"
+              },
+              {
+                "kind": "shotCount",
+                "value": 3
+              },
+              {
+                "kind": "replySchema"
+              },
+              {
+                "kind": "replyAction",
+                "value": "offer-run"
+              },
+              {
+                "kind": "sidecarWorkflowSchema",
+                "value": "@executioncontrolprotocol.workflow"
+              }
             ],
             "judge": {
               "enabled": false

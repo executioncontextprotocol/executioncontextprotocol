@@ -7,21 +7,45 @@
       "harness": "chat",
       "model": "default",
       "input": {
-        "message": "I need a new workflow with echo and summarize."
+        "message": "I need a new workflow with poem then summarize using generate."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "classifiedIntent", "value": "workflow-create" },
-          { "kind": "shotCount", "value": 3 },
-          { "kind": "shotTask", "shotIndex": 2, "task": "workflow-change-summary" },
-          { "kind": "replySchema" },
-          { "kind": "replyAction", "value": "offer-run" },
-          { "kind": "sidecarWorkflowSchema", "value": "@executioncontrolprotocol.workflow" }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "classifiedIntent",
+            "value": "workflow-create"
+          },
+          {
+            "kind": "shotCount",
+            "value": 3
+          },
+          {
+            "kind": "shotTask",
+            "shotIndex": 2,
+            "task": "workflow-change-summary"
+          },
+          {
+            "kind": "replySchema"
+          },
+          {
+            "kind": "replyAction",
+            "value": "offer-run"
+          },
+          {
+            "kind": "sidecarWorkflowSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "sidecarStepUses",
+            "capabilityId": "@executioncontrolprotocol/ollama.generate"
+          }
         ],
         "judge": {
           "enabled": true,
-          "goal": "Summarizes creating a workflow and asks to run",
+          "goal": "Summarizes creating poem/summarize workflow and asks to run",
           "rubric": "Mentions the change and asks to run",
           "requireApproved": true
         }
@@ -34,17 +58,34 @@
       "harness": "chat",
       "model": "default",
       "input": {
-        "message": "Change the echo step label to Patched Echo.",
-        "manifestRef": "workflows/echo-workflow.json"
+        "message": "Change the poem step label to Draft Poem.",
+        "manifestRef": "workflows/two-step-generate-chain.json"
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "classifiedIntent", "value": "workflow-patch" },
-          { "kind": "shotCount", "value": 3 },
-          { "kind": "replySchema" },
-          { "kind": "replyAction", "value": "offer-run" },
-          { "kind": "sidecarStepLabel", "stepId": "echo", "value": "Patched Echo" }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "classifiedIntent",
+            "value": "workflow-patch"
+          },
+          {
+            "kind": "shotCount",
+            "value": 3
+          },
+          {
+            "kind": "replySchema"
+          },
+          {
+            "kind": "replyAction",
+            "value": "offer-run"
+          },
+          {
+            "kind": "sidecarStepLabel",
+            "stepId": "poem",
+            "value": "Draft Poem"
+          }
         ],
         "judge": {
           "enabled": false
@@ -62,11 +103,23 @@
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "shotCount", "value": 2 },
-          { "kind": "replySchema" },
-          { "kind": "replyActionAbsent" },
-          { "kind": "answerContains", "text": "ECP" }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "shotCount",
+            "value": 2
+          },
+          {
+            "kind": "replySchema"
+          },
+          {
+            "kind": "replyActionAbsent"
+          },
+          {
+            "kind": "answerContains",
+            "text": "ECP"
+          }
         ],
         "judge": {
           "enabled": false
@@ -84,11 +137,22 @@
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "shotCount", "value": 2 },
-          { "kind": "replySchema" },
-          { "kind": "replyActionAbsent" },
-          { "kind": "answerRedirectsToScope" }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "shotCount",
+            "value": 2
+          },
+          {
+            "kind": "replySchema"
+          },
+          {
+            "kind": "replyActionAbsent"
+          },
+          {
+            "kind": "answerRedirectsToScope"
+          }
         ],
         "judge": {
           "enabled": false
@@ -103,16 +167,29 @@
       "model": "default",
       "input": {
         "message": "The last workflow run failed. Diagnose the errors from the run context and patch the workflow to fix them.",
-        "manifestRef": "workflows/echo-workflow.json",
-        "runContextFixture": "runs/failed-echo-step.json"
+        "manifestRef": "workflows/two-step-generate-chain.json",
+        "runContextFixture": "runs/failed-generate-step.json"
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "shotCount", "value": 3 },
-          { "kind": "replySchema" },
-          { "kind": "replyAction", "value": "offer-run" },
-          { "kind": "sidecarWorkflowSchema", "value": "@executioncontrolprotocol.workflow" }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "shotCount",
+            "value": 3
+          },
+          {
+            "kind": "replySchema"
+          },
+          {
+            "kind": "replyAction",
+            "value": "offer-run"
+          },
+          {
+            "kind": "sidecarWorkflowSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          }
         ],
         "judge": {
           "enabled": false

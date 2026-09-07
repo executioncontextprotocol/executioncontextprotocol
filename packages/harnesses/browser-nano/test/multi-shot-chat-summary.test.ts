@@ -8,7 +8,6 @@ import {
   harness,
   registerCoreFormats,
 } from "@executioncontrolprotocol/core"
-import { registerTestExtension } from "../../../core/src/testing/test-extension.js"
 import {
   BROWSER_NANO_HARNESS_CAPABILITY,
   registerBrowserNanoHarnesses,
@@ -26,6 +25,23 @@ import {
   type HarnessInvokeResult,
 } from "@executioncontrolprotocol/types"
 
+const CHROME_GEN_EQL = `WORKFLOW demo "Demo"
+STEP poem USES @executioncontrolprotocol/chrome-ai.generate
+  LABEL "Generate Poem"
+  WITH prompt = "Write a short poem about the ocean."
+  AS poem`
+
+/** Node-safe stub so workflows can USE chrome-ai.generate under the Node runtime. */
+const chromeAiStubExtension = defineExtension("@executioncontrolprotocol", "chrome-ai")
+  .withConfig({})
+  .withCapabilities([
+    capabilityFor("@executioncontrolprotocol/chrome-ai", "generate")
+      .withInput(modelGenerateInputSchema)
+      .withOutput(modelGenerateOutputSchema)
+      .withHandler(async () => ({ text: "stub generate" })),
+  ])
+  .build()
+
 const scriptedGenExtension = defineExtension("@executioncontrolprotocol", "scripted-chat-gen")
   .withConfig({})
   .withCapabilities([
@@ -37,18 +53,23 @@ const scriptedGenExtension = defineExtension("@executioncontrolprotocol", "scrip
         if (/Summarize the workflow changes/i.test(prompt)) {
           return {
             text: `REPLY
-  ANSWER "I created an echo workflow. Want me to run it?"
+  ANSWER "I created a Chrome AI generate workflow. Want me to run it?"
   ACTION offer-run`,
           }
         }
-        // Intent classification prompts are short and ask for INTENT output
-        if (
-          /INTENT workflow-create|Reply with SQL-like EQL only|intent classification|Classify/i.test(
+        // Case-sensitive STEP/WORKFLOW so "Create a workflow..." still counts as intent.
+        const looksLikeAuthoringPrompt =
+          /\bEnvironment\b/.test(prompt) ||
+          /\bExisting step\b/.test(prompt) ||
+          /\bcapabilities loaded\b/i.test(prompt) ||
+          /^STEP /m.test(prompt) ||
+          /^WORKFLOW /m.test(prompt)
+        const isIntentShot =
+          /intent classification|Classify the user message into exactly one intent/i.test(
             prompt
           ) ||
-          (/User message: Create a workflow with echo/i.test(prompt) &&
-            !/Environment|Existing step|capabilities loaded/i.test(prompt))
-        ) {
+          (/User message: /i.test(prompt) && !looksLikeAuthoringPrompt)
+        if (isIntentShot) {
           if (/What is ECP/i.test(prompt)) {
             return {
               text: `INTENT faq
@@ -59,23 +80,10 @@ const scriptedGenExtension = defineExtension("@executioncontrolprotocol", "scrip
           return {
             text: `INTENT workflow-create
   TOPIC create
-  SUMMARY "create echo workflow"`,
+  SUMMARY "create generate workflow"`,
           }
         }
-        if (/What is ECP/i.test(prompt) && !/Environment|Existing step/i.test(prompt)) {
-          return {
-            text: `INTENT faq
-  TOPIC ecp
-  SUMMARY "what is ecp"`,
-          }
-        }
-        // Authoring / repair
-        return {
-          text: `WORKFLOW demo "Demo"
-STEP echo USES @executioncontrolprotocol/test.echo
-  WITH value = "hello"
-  AS echo`,
-        }
+        return { text: CHROME_GEN_EQL }
       }),
   ])
   .build()
@@ -85,7 +93,7 @@ describe("multi-shot chat change summary", () => {
     await registerCoreFormats()
     await registerFormatEqlExtension()
     await registerNodeRuntime()
-    await registerTestExtension()
+    catalogExtension(chromeAiStubExtension)
     catalogExtension(scriptedGenExtension)
     resetBrowserNanoHarnessRegistrationForTests()
     registerBrowserNanoHarnesses()
@@ -96,7 +104,7 @@ describe("multi-shot chat change summary", () => {
       .withRuntime(runtime(NODE_RUNTIME_ID))
       .withExtensions([
         extension("@executioncontrolprotocol/format-eql").with({}),
-        extension("@executioncontrolprotocol/test").with({}),
+        extension("@executioncontrolprotocol/chrome-ai").with({}),
         extension("@executioncontrolprotocol/scripted-chat-gen").with({}),
       ])
       .withHarnesses([
@@ -111,7 +119,7 @@ describe("multi-shot chat change summary", () => {
         .invoke(BROWSER_NANO_HARNESS_CAPABILITY)
         .with({
           task: "chat",
-          message: "Create a workflow with echo.",
+          message: "Create a workflow with Chrome AI generate.",
         })
         .process()
 
@@ -135,7 +143,7 @@ describe("multi-shot chat change summary", () => {
       .withRuntime(runtime(NODE_RUNTIME_ID))
       .withExtensions([
         extension("@executioncontrolprotocol/format-eql").with({}),
-        extension("@executioncontrolprotocol/test").with({}),
+        extension("@executioncontrolprotocol/chrome-ai").with({}),
         extension("@executioncontrolprotocol/scripted-chat-gen").with({}),
       ])
       .withHarnesses([

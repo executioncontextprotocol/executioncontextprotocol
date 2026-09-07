@@ -4,14 +4,14 @@
     "version": "1.0",
     "run": { "id": "run-completed-chain", "status": "completed" },
     "history": {
-      "echo": {
+      "poem": {
         "status": "completed",
-        "output": { "echo": "seed" },
-        "committedAs": "state.echo.output"
+        "output": { "text": "Ocean waves whisper soft." },
+        "committedAs": "state.poem.output"
       },
       "summarize": {
         "status": "completed",
-        "output": { "ok": true, "result": "seed" }
+        "output": { "text": "A short ocean poem." }
       }
     }
   }

@@ -1,0 +1,46 @@
+{
+  "schema": "@executioncontrolprotocol.workflow",
+  "version": "1.0",
+  "workflow": {
+    "id": "trivia-critique",
+    "label": "Trivia Critique"
+  },
+  "steps": [
+    {
+      "type": "step",
+      "id": "question",
+      "label": "Ask Trivia Question",
+      "uses": "@executioncontrolprotocol/chrome-ai.generate",
+      "input": {
+        "prompt": "Ask a trivia question."
+      },
+      "as": "question"
+    },
+    {
+      "type": "step",
+      "id": "answer",
+      "label": "Draft Answer",
+      "uses": "@executioncontrolprotocol/chrome-ai.generate",
+      "input": {
+        "prompt": "Draft an answer to the following trivia question:",
+        "context": {
+          "$ref": "state.question.text"
+        }
+      },
+      "as": "answer"
+    },
+    {
+      "type": "step",
+      "id": "critique",
+      "label": "Critique Answer",
+      "uses": "@executioncontrolprotocol/chrome-ai.generate",
+      "input": {
+        "prompt": "Critique the following trivia answer:",
+        "context": {
+          "$ref": "state.answer.text"
+        }
+      },
+      "as": "critique"
+    }
+  ]
+}

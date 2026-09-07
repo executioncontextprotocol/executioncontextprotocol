@@ -3,11 +3,11 @@
     {
       "id": "wf-create-01",
       "suite": "workflow-create",
-      "title": "Minimal echo",
+      "title": "Minimal generate",
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create a minimal @executioncontrolprotocol.workflow with one step id echo using @executioncontrolprotocol/test.echo and input value hello."
+        "request": "Create a minimal @executioncontrolprotocol.workflow with one step that uses @executioncontrolprotocol/chrome-ai.generate to summarize the text hello in one sentence."
       },
       "assertions": {
         "deterministic": [
@@ -32,7 +32,7 @@
           },
           {
             "kind": "stepUses",
-            "capabilityId": "@executioncontrolprotocol/test.echo"
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
           },
           {
             "kind": "stepCount",
@@ -47,11 +47,11 @@
     {
       "id": "wf-create-02",
       "suite": "workflow-create",
-      "title": "Echo plus summarize",
+      "title": "Poem then summarize",
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create a workflow with echo (@executioncontrolprotocol/test.echo) then summarize (@executioncontrolprotocol/test.summarize) passing echo output."
+        "request": "Create a two-step workflow: generate a short poem with @executioncontrolprotocol/chrome-ai.generate, then summarize that poem with the same capability."
       },
       "assertions": {
         "deterministic": [
@@ -80,7 +80,7 @@
           },
           {
             "kind": "stepUses",
-            "capabilityId": "@executioncontrolprotocol/test.summarize"
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
           }
         ],
         "judge": {
@@ -91,11 +91,11 @@
     {
       "id": "wf-create-03",
       "suite": "workflow-create",
-      "title": "Validate then echo",
+      "title": "Email then actions",
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Build a workflow: first @executioncontrolprotocol/test.validate then @executioncontrolprotocol/test.echo."
+        "request": "Build a workflow that uses Chrome AI to generate a short sample email with a meeting summary, then extract key action items from it in a second step."
       },
       "assertions": {
         "deterministic": [
@@ -119,8 +119,12 @@
             ]
           },
           {
+            "kind": "stepCount",
+            "exact": 2
+          },
+          {
             "kind": "stepUses",
-            "capabilityId": "@executioncontrolprotocol/test.validate"
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
           }
         ],
         "judge": {
@@ -131,11 +135,11 @@
     {
       "id": "wf-create-04",
       "suite": "workflow-create",
-      "title": "Notify step",
+      "title": "Haiku then explain",
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create workflow with @executioncontrolprotocol/test.echo and a final @executioncontrolprotocol/test.notify step."
+        "request": "Create a two-step workflow: Chrome AI writes a haiku, then Chrome AI explains what it means."
       },
       "assertions": {
         "deterministic": [
@@ -159,8 +163,12 @@
             ]
           },
           {
+            "kind": "stepCount",
+            "exact": 2
+          },
+          {
             "kind": "stepUses",
-            "capabilityId": "@executioncontrolprotocol/test.notify"
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
           }
         ],
         "judge": {
@@ -171,11 +179,11 @@
     {
       "id": "wf-create-05",
       "suite": "workflow-create",
-      "title": "Translate branch",
+      "title": "Trivia critique",
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create a two-step workflow using @executioncontrolprotocol/test.echo and @executioncontrolprotocol/test.translate."
+        "request": "Build a three-step Chrome AI workflow: ask a trivia question, draft an answer, then critique the answer."
       },
       "assertions": {
         "deterministic": [
@@ -199,8 +207,12 @@
             ]
           },
           {
+            "kind": "stepCount",
+            "exact": 3
+          },
+          {
             "kind": "stepUses",
-            "capabilityId": "@executioncontrolprotocol/test.translate"
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
           }
         ],
         "judge": {
@@ -215,7 +227,7 @@
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Crea un flujo con un paso echo usando @executioncontrolprotocol/test.echo."
+        "request": "Crea un flujo con un paso generate usando @executioncontrolprotocol/chrome-ai.generate."
       },
       "assertions": {
         "deterministic": [
@@ -240,7 +252,7 @@
           },
           {
             "kind": "stepUses",
-            "capabilityId": "@executioncontrolprotocol/test.echo"
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
           }
         ],
         "judge": {
@@ -255,7 +267,7 @@
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Créez un workflow avec une étape @executioncontrolprotocol/test.echo."
+        "request": "Créez un workflow avec une étape @executioncontrolprotocol/chrome-ai.generate."
       },
       "assertions": {
         "deterministic": [
@@ -280,7 +292,7 @@
           },
           {
             "kind": "stepUses",
-            "capabilityId": "@executioncontrolprotocol/test.echo"
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
           }
         ],
         "judge": {
@@ -295,7 +307,7 @@
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Erstelle einen Workflow mit @executioncontrolprotocol/test.echo."
+        "request": "Erstelle einen Workflow mit @executioncontrolprotocol/chrome-ai.generate."
       },
       "assertions": {
         "deterministic": [
@@ -320,7 +332,7 @@
           },
           {
             "kind": "stepUses",
-            "capabilityId": "@executioncontrolprotocol/test.echo"
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
           }
         ],
         "judge": {
@@ -331,11 +343,11 @@
     {
       "id": "wf-create-09",
       "suite": "workflow-create",
-      "title": "Triple steps",
+      "title": "Triple generate chain",
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create a 3-step workflow using @executioncontrolprotocol/test.validate, @executioncontrolprotocol/test.echo, and @executioncontrolprotocol/test.summarize."
+        "request": "Create a 3-step workflow using @executioncontrolprotocol/chrome-ai.generate for question, answer, and critique steps."
       },
       "assertions": {
         "deterministic": [
@@ -361,6 +373,10 @@
           {
             "kind": "stepCount",
             "min": 3
+          },
+          {
+            "kind": "stepUses",
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
           }
         ],
         "judge": {
@@ -371,11 +387,11 @@
     {
       "id": "wf-create-10",
       "suite": "workflow-create",
-      "title": "Workflow id minimal-echo",
+      "title": "Workflow id chrome-summarize",
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create workflow id minimal-echo with one @executioncontrolprotocol/test.echo step labeled Runner."
+        "request": "Create workflow id chrome-summarize with one @executioncontrolprotocol/chrome-ai.generate step labeled Summarize."
       },
       "assertions": {
         "deterministic": [
@@ -400,7 +416,11 @@
           },
           {
             "kind": "stepUses",
-            "capabilityId": "@executioncontrolprotocol/test.echo"
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
+          },
+          {
+            "kind": "stepCount",
+            "exact": 1
           }
         ],
         "judge": {
@@ -415,7 +435,7 @@
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Design a clear production workflow using @executioncontrolprotocol/test.echo for ingestion."
+        "request": "Design a clear production workflow using @executioncontrolprotocol/chrome-ai.generate for content generation."
       },
       "assertions": {
         "deterministic": [
@@ -441,7 +461,7 @@
         ],
         "judge": {
           "enabled": true,
-          "goal": "Workflow is coherent and references echo capability",
+          "goal": "Workflow is coherent and references chrome-ai.generate",
           "requireApproved": true
         }
       }
@@ -453,7 +473,7 @@
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "List capabilities then create echo-only workflow with @executioncontrolprotocol/test.echo."
+        "request": "List capabilities then create generate-only workflow with @executioncontrolprotocol/chrome-ai.generate."
       },
       "assertions": {
         "deterministic": [
@@ -479,8 +499,7 @@
           {
             "kind": "descriptorListsCapabilities",
             "ids": [
-              "@executioncontrolprotocol/test.echo",
-              "@executioncontrolprotocol/test.summarize"
+              "@executioncontrolprotocol/chrome-ai.generate"
             ]
           }
         ],

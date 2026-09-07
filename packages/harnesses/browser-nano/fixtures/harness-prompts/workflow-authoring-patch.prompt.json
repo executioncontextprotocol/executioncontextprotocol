@@ -6,60 +6,60 @@
   "promptFormat": "eql",
   "fewShots": [
     {
-      "message": "Change the echo step label to Patched Echo.",
-      "output": "PATCH WORKFLOW echo-test\nUPDATE STEP echo\n  LABEL \"Patched Echo\""
+      "message": "Change the poem step label to Draft Poem.",
+      "output": "PATCH WORKFLOW poem-summarize\nUPDATE STEP poem\n  LABEL \"Draft Poem\""
     },
     {
-      "message": "Rename echo label to Translated Output.",
-      "output": "PATCH WORKFLOW echo-test\nUPDATE STEP echo\n  LABEL \"Translated Output\""
+      "message": "Rename summarize label to Brief Summary.",
+      "output": "PATCH WORKFLOW poem-summarize\nUPDATE STEP summarize\n  LABEL \"Brief Summary\""
     },
     {
-      "message": "Set echo input value to world.",
-      "output": "PATCH WORKFLOW echo-test\nUPDATE STEP echo\n  WITH value = \"world\""
+      "message": "Set poem prompt to Write a short poem about rivers.",
+      "output": "PATCH WORKFLOW poem-summarize\nUPDATE STEP poem\n  WITH prompt = \"Write a short poem about rivers.\""
     },
     {
-      "message": "Change summarize step label to Short Summary.",
-      "output": "PATCH WORKFLOW two-step-chain\nUPDATE STEP summarize\n  LABEL \"Short Summary\""
+      "message": "Change actions step label to Key Action Items.",
+      "output": "PATCH WORKFLOW email-action\nUPDATE STEP actions\n  LABEL \"Key Action Items\""
     },
     {
-      "message": "Insert a validate step before echo using @executioncontrolprotocol/test.validate.",
-      "output": "PATCH WORKFLOW echo-test\nADD STEP validate USES @executioncontrolprotocol/test.validate BEFORE echo\n  LABEL \"Validate\"\n  WITH payload = {\"ok\": true}\n  AS validated"
+      "message": "Insert a title step before poem using @executioncontrolprotocol/chrome-ai.generate.",
+      "output": "PATCH WORKFLOW poem-summarize\nADD STEP title USES @executioncontrolprotocol/chrome-ai.generate BEFORE poem\n  LABEL \"Generate Title\"\n  WITH prompt = \"Write a short title for a poem about the ocean.\"\n  AS title"
     },
     {
-      "message": "Add a summarize step after echo using @executioncontrolprotocol/test.summarize.",
-      "output": "PATCH WORKFLOW echo-test\nADD STEP summarize USES @executioncontrolprotocol/test.summarize AFTER echo\n  LABEL \"Summarize\"\n  WITH payload = REF echo.output\n  AS summary"
+      "message": "Add a critique step after summarize using @executioncontrolprotocol/chrome-ai.generate.",
+      "output": "PATCH WORKFLOW poem-summarize\nADD STEP critique USES @executioncontrolprotocol/chrome-ai.generate AFTER summarize\n  LABEL \"Critique Summary\"\n  WITH prompt = \"Critique the following poem summary:\"\n  WITH context = REF summary.text\n  AS critique"
     },
     {
-      "message": "Ensure summarize input references echo output via $ref.",
-      "output": "PATCH WORKFLOW two-step-chain\nUPDATE STEP summarize\n  WITH payload = REF echo.output"
+      "message": "Ensure summarize context references poem text via REF.",
+      "output": "PATCH WORKFLOW poem-summarize\nUPDATE STEP summarize\n  WITH context = REF poem.text"
     },
     {
-      "message": "Add translate after echo and remove summarize if present.",
-      "output": "PATCH WORKFLOW two-step-chain\nDELETE STEP summarize\nADD STEP translate USES @executioncontrolprotocol/test.translate AFTER echo\n  LABEL \"Translate\"\n  WITH text = REF echo.output\n  AS translated"
+      "message": "Add explain after poem and remove summarize if present.",
+      "output": "PATCH WORKFLOW poem-summarize\nDELETE STEP summarize\nADD STEP explain USES @executioncontrolprotocol/chrome-ai.generate AFTER poem\n  LABEL \"Explain Poem\"\n  WITH prompt = \"Explain what the following poem means:\"\n  WITH context = REF poem.text\n  AS explain"
     },
     {
-      "message": "Move the echo step to run after validate.",
-      "output": "PATCH WORKFLOW echo-validate\nMOVE STEP echo AFTER validate"
+      "message": "Move the summarize step to run after poem.",
+      "output": "PATCH WORKFLOW poem-summarize\nMOVE STEP summarize AFTER poem"
     },
     {
-      "message": "Remove the notify step from the workflow.",
-      "output": "PATCH WORKFLOW multi-cap\nDELETE STEP notify"
+      "message": "Remove the critique step from the workflow.",
+      "output": "PATCH WORKFLOW trivia-critique\nDELETE STEP critique"
     },
     {
-      "message": "Change workflow label to Updated Chain.",
-      "output": "PATCH WORKFLOW two-step-chain\nUPDATE WORKFLOW\n  LABEL \"Updated Chain\""
+      "message": "Change workflow label to Updated Poem Chain.",
+      "output": "PATCH WORKFLOW poem-summarize\nUPDATE WORKFLOW\n  LABEL \"Updated Poem Chain\""
     },
     {
-      "message": "Add ACCEPTS WITH value:string! and wire echo from REF value.",
-      "output": "PATCH WORKFLOW echo-test\nUPDATE WORKFLOW\n  ACCEPTS\n    WITH value:string!\nUPDATE STEP echo\n  WITH value = REF value"
+      "message": "Add ACCEPTS WITH topic:string! and wire poem prompt from REF topic.",
+      "output": "PATCH WORKFLOW poem-summarize\nUPDATE WORKFLOW\n  ACCEPTS\n    WITH topic:string!\nUPDATE STEP poem\n  WITH prompt = REF topic"
     },
     {
-      "message": "Add RETURNS OUT echo:object! to workflow echo-accepts.",
-      "output": "PATCH WORKFLOW echo-accepts\nUPDATE WORKFLOW\n  RETURNS\n    OUT echo:object!"
+      "message": "Add RETURNS OUT email:object! and OUT actions:object! to workflow email-action.",
+      "output": "PATCH WORKFLOW email-action\nUPDATE WORKFLOW\n  RETURNS\n    OUT email:object!\n    OUT actions:object!"
     },
     {
       "message": "Remove workflow returns with CLEAR RETURNS.",
-      "output": "PATCH WORKFLOW echo-from-input\nUPDATE WORKFLOW\n  CLEAR RETURNS"
+      "output": "PATCH WORKFLOW email-from-notes\nUPDATE WORKFLOW\n  CLEAR RETURNS"
     }
   ],
   "repairHint": "Return corrected @executioncontrolprotocol.patch EQL only. First line MUST be PATCH WORKFLOW <workflow-id>. Use UPDATE WORKFLOW for workflow label changes; UPDATE STEP for step label or input changes."
