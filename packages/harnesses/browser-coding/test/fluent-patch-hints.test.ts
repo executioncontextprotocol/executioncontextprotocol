@@ -55,6 +55,16 @@ describe("buildFluentPatchHintLines", () => {
     expect(text).toContain("Reorder .run([...])")
     expect(text).toContain("poem, summarize")
   })
+
+  it("wf-patch-13 steers .run([]) for remove-all", () => {
+    const wf = loadWorkflow("haiku-explain-workflow.json")
+    const lines = buildFluentPatchHintLines("Remove all steps from the workflow.", wf)
+    const text = lines.join("\n")
+    expect(text).toContain(".run([])")
+    expect(text).toContain("haiku")
+    expect(text).toContain("explain")
+    expect(text).not.toContain("Preserve every existing step")
+  })
 })
 
 describe("collectFluentCompileErrorFeedback", () => {
@@ -106,6 +116,19 @@ describe("collectFluentPatchGoalFeedback", () => {
     expect(
       feedback!.some((f) => f.issues.some((i) => i.message.includes("poem")))
     ).toBe(true)
+  })
+
+  it("flags remaining steps after remove-all", () => {
+    const baseline = loadWorkflow("haiku-explain-workflow.json")
+    const feedback = collectFluentPatchGoalFeedback(
+      "Remove all steps from the workflow.",
+      baseline,
+      { capabilities: [], extensions: [] } as import("@executioncontrolprotocol/core").CompactEnvironmentSummary,
+      baseline
+    )
+    const text = (feedback ?? []).flatMap((f) => f.issues.map((i) => i.message)).join("\n")
+    expect(text).toMatch(/clears all steps/i)
+    expect(text).toContain(".run([])")
   })
 
   it("flags string returns on chrome-ai.generate .as key", () => {

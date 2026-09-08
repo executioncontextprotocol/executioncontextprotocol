@@ -1,7 +1,7 @@
 {
   "id": "workflow-authoring-patch-coding",
   "role": "You are an ECP workflow editor for coding models. You revise workflows using only the Fluent API (TypeScript).",
-  "task": "The user prompt includes the current workflow as Fluent TypeScript. Apply the user request and return a complete revised module: import { workflow, step, ref } from \"@executioncontrolprotocol/core\" and export default workflow(...). Preserve workflow .id() and every existing step .id() unless the request adds or removes steps. Preserve .accepts() and .returns() unless the request changes workflow I/O. Change only what the request requires. No EQL, no JSON patch, no invented methods (.remove, .after, moveStep). Never use an identifier named typescript.",
+  "task": "The user prompt includes the current workflow as Fluent TypeScript. Apply the user request and return a complete revised module: import { workflow, step, ref } from \"@executioncontrolprotocol/core\" and export default workflow(...). Preserve workflow .id() and every existing step .id() unless the request adds or removes steps. For remove-all / clear / start-fresh, rebuild .run([]) or .run([...]) with only the new steps while keeping the same workflow .id(). Preserve .accepts() and .returns() unless the request changes workflow I/O. Change only what the request requires. No EQL, no JSON patch, no invented methods (.remove, .after, moveStep). Never use an identifier named typescript.",
   "outputSchema": "@executioncontrolprotocol.workflow",
   "promptFormat": "typescript",
   "fewShots": [
@@ -16,6 +16,14 @@
     {
       "message": "Remove the critique step from the workflow.",
       "output": "import { workflow, step, ref } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Trivia Critique\")\n  .id(\"trivia-critique\")\n  .run([\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Ask Trivia Question\")\n      .id(\"question\")\n      .with({ prompt: \"Ask a trivia question.\" })\n      .as(\"question\"),\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Draft Answer\")\n      .id(\"answer\")\n      .with({\n        prompt: \"Draft an answer to the following trivia question:\",\n        context: ref(\"question.text\"),\n      })\n      .as(\"answer\"),\n  ])"
+    },
+    {
+      "message": "Remove all steps from the workflow.",
+      "output": "import { workflow, step } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Haiku Explain\")\n  .id(\"haiku-explain\")\n  .run([])"
+    },
+    {
+      "message": "Clear the workflow and start fresh with one @executioncontrolprotocol/chrome-ai.generate step that writes a haiku.",
+      "output": "import { workflow, step } from \"@executioncontrolprotocol/core\"\n\nexport default workflow(\"Haiku Explain\")\n  .id(\"haiku-explain\")\n  .run([\n    step(\"@executioncontrolprotocol/chrome-ai.generate\", \"Write Haiku\")\n      .id(\"haiku\")\n      .with({ prompt: \"Write a haiku.\" })\n      .as(\"haiku\"),\n  ])"
     },
     {
       "message": "Change workflow label to Updated Poem Chain.",

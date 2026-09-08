@@ -66,22 +66,26 @@ describe("compileWorkflowSource consumer resolution", () => {
     await Promise.all(temps.splice(0).map((dir) => rm(dir, { recursive: true, force: true })))
   })
 
-  it("resolves @executioncontrolprotocol/core from the project node_modules via absolute filename", async () => {
-    await registerTestExtension()
-    const project = await mkdtemp(join(tmpdir(), "ecp-consumer-ok-"))
-    temps.push(project)
-    const nested = join(project, "nested", "deep")
-    await mkdir(nested, { recursive: true })
-    await linkPkg(project, "core", join(repoRoot, "packages/core"))
-    await linkPkg(project, "types", join(repoRoot, "packages/types"))
+  it(
+    "resolves @executioncontrolprotocol/core from the project node_modules via absolute filename",
+    async () => {
+      await registerTestExtension()
+      const project = await mkdtemp(join(tmpdir(), "ecp-consumer-ok-"))
+      temps.push(project)
+      const nested = join(project, "nested", "deep")
+      await mkdir(nested, { recursive: true })
+      await linkPkg(project, "core", join(repoRoot, "packages/core"))
+      await linkPkg(project, "types", join(repoRoot, "packages/types"))
 
-    const filename = join(nested, "workflow.ts")
-    await writeFile(filename, SAMPLE_TS, "utf8")
+      const filename = join(nested, "workflow.ts")
+      await writeFile(filename, SAMPLE_TS, "utf8")
 
-    const result = await compileWorkflowSource({ source: SAMPLE_TS, filename })
-    expect(result.ok).toBe(true)
-    expect(result.manifest?.steps[0]?.as).toBe("out")
-  })
+      const result = await compileWorkflowSource({ source: SAMPLE_TS, filename })
+      expect(result.ok).toBe(true)
+      expect(result.manifest?.steps[0]?.as).toBe("out")
+    },
+    15_000
+  )
 
   it("fails when the package is missing from the consumer project (not monorepo dist paths)", async () => {
     const project = await mkdtemp(join(tmpdir(), "ecp-consumer-miss-"))

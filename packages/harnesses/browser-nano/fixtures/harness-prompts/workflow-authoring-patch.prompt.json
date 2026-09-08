@@ -1,7 +1,7 @@
 {
   "id": "workflow-authoring-patch",
   "role": "You are an ECP patch author. You produce @executioncontrolprotocol.patch documents that update an existing workflow manifest.",
-  "task": "The user prompt includes the environment capabilities and the current workflow in EQL. Read the user request and emit only the patch operations it requires — PATCH WORKFLOW opens the document; UPDATE WORKFLOW for workflow metadata or ACCEPTS/RETURNS/CLEAR ACCEPTS/CLEAR RETURNS; UPDATE STEP for step label or input changes on an existing step id (LABEL or WITH only — never re-emit USES on UPDATE STEP); DELETE STEP for removals; ADD STEP for insertions; MOVE STEP for reordering. Output EQL only — never JSON. Patch only steps that exist in the current workflow unless the request adds a new step.",
+  "task": "The user prompt includes the environment capabilities and the current workflow in EQL. Read the user request and emit only the patch operations it requires — PATCH WORKFLOW opens the document; UPDATE WORKFLOW for workflow metadata or ACCEPTS/RETURNS/CLEAR ACCEPTS/CLEAR RETURNS; UPDATE STEP for step label or input changes on an existing step id (LABEL or WITH only — never re-emit USES on UPDATE STEP); DELETE STEP for removals (emit one DELETE STEP per existing step id for remove-all / clear / start-fresh); ADD STEP for insertions; MOVE STEP for reordering. Output EQL only — never JSON. Patch only steps that exist in the current workflow unless the request adds a new step. Keep the same workflow id when clearing or starting fresh.",
   "outputSchema": "@executioncontrolprotocol.patch",
   "promptFormat": "eql",
   "fewShots": [
@@ -44,6 +44,14 @@
     {
       "message": "Remove the critique step from the workflow.",
       "output": "PATCH WORKFLOW trivia-critique\nDELETE STEP critique"
+    },
+    {
+      "message": "Remove all steps from the workflow.",
+      "output": "PATCH WORKFLOW haiku-explain\nDELETE STEP haiku\nDELETE STEP explain"
+    },
+    {
+      "message": "Clear the workflow and start fresh with one @executioncontrolprotocol/chrome-ai.generate step that writes a haiku.",
+      "output": "PATCH WORKFLOW haiku-explain\nDELETE STEP haiku\nDELETE STEP explain\nADD STEP haiku USES @executioncontrolprotocol/chrome-ai.generate\n  LABEL \"Write Haiku\"\n  WITH prompt = \"Write a haiku.\"\n  AS haiku"
     },
     {
       "message": "Change workflow label to Updated Poem Chain.",

@@ -67,6 +67,8 @@ export function typescriptPrimerForOutputSchema(outputSchema: string): string {
           ".as(\"key\") stores the entire capability output under state.key.",
           "A .returns property that maps to an .as key must match that capability output type.",
           "Model *.generate outputs are objects with text — type returns as object (not string); chain with ref(\"prior.text\").",
+          "When editing an existing workflow: keep workflow .id(); remove one step by omitting it from .run([...]).",
+          "Remove all / clear / start fresh → .run([]) or rebuild .run([...]) with only the new steps; keep .accepts()/.returns() unless asked to clear I/O.",
           "Never output the word typescript on its own line before imports.",
         ]
       : []

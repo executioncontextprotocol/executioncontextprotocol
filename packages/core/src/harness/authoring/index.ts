@@ -62,6 +62,10 @@ export {
   recoverStructuredPatchFromRequest,
   type StructuredPatchRecoveryContext,
 } from "./recover-structured-patch.js"
+export {
+  isClearAllStepsRequest,
+  isClearAndRebuildRequest,
+} from "./patch-clear-intent.js"
 export { normalizeIntentEqlRawOutput, coerceIntentEqlRawOutput } from "./normalize-intent-eql-output.js"
 export {
   repairWorkflowJsonSyntax,

@@ -229,6 +229,29 @@ describe("request-capability-hints", () => {
     expect(text).toContain("Do not UPDATE STEP summarize")
   })
 
+  it("buildPatchOperationHintLines lists DELETE for every step on remove-all", () => {
+    const lines = buildPatchOperationHintLines(
+      "Remove all steps from the workflow.",
+      poemSummarizeWorkflow()
+    )
+    const text = lines.join("\n")
+    expect(text).toContain("DELETE STEP poem")
+    expect(text).toContain("DELETE STEP summarize")
+    expect(text).toContain("clears all steps")
+  })
+
+  it("collectPatchGoalFeedback flags remaining steps after clear-all", () => {
+    const feedback = collectPatchGoalFeedback(
+      "Remove all steps from the workflow.",
+      poemSummarizeWorkflow(),
+      summary,
+      poemSummarizeWorkflow()
+    )
+    const text = (feedback ?? []).flatMap((f) => f.issues.map((i) => i.message)).join("\n")
+    expect(text).toMatch(/clears all steps/i)
+    expect(text).toContain("poem")
+  })
+
   it("buildRequestCapabilityHintLines patch mode does not inject operation templates", () => {
     const lines = buildRequestCapabilityHintLines(
       `Add a summarize step after poem using ${CHROME_GEN}.`,

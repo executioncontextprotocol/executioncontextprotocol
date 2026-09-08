@@ -58,6 +58,9 @@ const patches = [
   ["wf-patch-10", "Patch judge", "Improve poem label to be user friendly.", "workflows/two-step-generate-chain.json", [], { enabled: true, goal: "Patch is minimal and correct", requireApproved: true }],
   ["wf-patch-11", "Rename email label", "Rename the email step label to Draft Meeting Email.", "workflows/email-action-workflow.json", [{ kind: "stepLabel", stepId: "email", value: "Draft Meeting Email" }]],
   ["wf-patch-12", "Move summarize", "Move the summarize step to run after poem.", "workflows/two-step-generate-chain.json", [{ kind: "stepOrder", stepIds: ["poem", "summarize"] }]],
+  ["wf-patch-13", "Remove all steps", "Remove all steps from the workflow.", "workflows/haiku-explain-workflow.json", [{ kind: "stepCount", exact: 0 }, { kind: "stepRemoved", stepId: "haiku" }, { kind: "stepRemoved", stepId: "explain" }]],
+  ["wf-patch-14", "Start fresh rebuild", `Clear the workflow and start fresh with one ${chromeGen} step that writes a haiku.`, "workflows/haiku-explain-workflow.json", [{ kind: "stepCount", exact: 1 }, { kind: "stepUses", capabilityId: chromeGen }]],
+  ["wf-patch-15", "Clear steps keep I/O", "Clear the steps but keep accepts and returns.", "workflows/generate-accepts-returns-workflow.json", [{ kind: "stepCount", exact: 0 }, { kind: "workflowAcceptsHasProperties", properties: ["prompt"] }, { kind: "workflowReturnsHasProperties", properties: ["response"] }]],
 ].map(([id, title, request, baseline, extra, judge]) => ({
   id,
   suite: "workflow-patch",
@@ -95,6 +98,7 @@ const intents = [
   ["intent-15", "FAQ patch how-to", "How does step patching work in ECP?", "faq", true],
   ["intent-16", "Label patch", "Change the poem step label to Draft Poem.", "workflow-patch", false],
   ["intent-17", "Off-topic weather", "What's the weather today?", "general", true],
+  ["intent-18", "Clear all steps", "Remove all steps and start fresh.", "workflow-patch", false],
 ].map(([id, title, message, intent, judge]) => ({
   id,
   suite: "intent",

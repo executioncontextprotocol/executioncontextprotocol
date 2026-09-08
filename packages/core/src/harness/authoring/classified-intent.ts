@@ -1,4 +1,5 @@
 import type { EcpIntent, EcpIntentValue } from "@executioncontrolprotocol/types"
+import { isClearAllStepsRequest } from "./patch-clear-intent.js"
 
 const SUMMARY_MAX_LENGTH = 120
 
@@ -55,6 +56,9 @@ export function inferIntentFromMessageHeuristic(message: string): EcpIntentValue
     return "workflow-patch"
   }
   if (/\b(change|update|set|fix)\b/i.test(msg) && /\b(step|label|echo)\b/i.test(msg)) {
+    return "workflow-patch"
+  }
+  if (isClearAllStepsRequest(msg)) {
     return "workflow-patch"
   }
   if (/\b(create|build|need)\b/i.test(msg) && /\bworkflow\b/i.test(msg)) {
@@ -237,6 +241,11 @@ export function formatIntentRoutingHintLines(message: string): string[] {
     /\b(step|echo|summarize|validate|notify|translate)\b/i.test(message)
   ) {
     lines.push("Routing hint: changing an existing step → INTENT workflow-patch.")
+  }
+  if (isClearAllStepsRequest(message)) {
+    lines.push(
+      "Routing hint: clear / remove all / start fresh on an existing workflow → INTENT workflow-patch (keep workflow id; delete or rebuild steps)."
+    )
   }
   if (/\bfailed\b/i.test(message) && /\b(step|workflow|echo)\b/i.test(message)) {
     lines.push("Routing hint: workflow failure symptom → INTENT workflow-patch.")

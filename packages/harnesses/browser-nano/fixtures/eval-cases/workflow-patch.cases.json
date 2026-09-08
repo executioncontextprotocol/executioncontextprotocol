@@ -387,6 +387,126 @@
           "enabled": false
         }
       }
+    },
+    {
+      "id": "wf-patch-13",
+      "suite": "workflow-patch",
+      "title": "Remove all steps",
+      "harness": "workflow-authoring",
+      "model": "default",
+      "baselineWorkflow": "workflows/haiku-explain-workflow.json",
+      "input": {
+        "request": "Remove all steps from the workflow."
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "stepCount",
+            "exact": 0
+          },
+          {
+            "kind": "stepRemoved",
+            "stepId": "haiku"
+          },
+          {
+            "kind": "stepRemoved",
+            "stepId": "explain"
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "wf-patch-14",
+      "suite": "workflow-patch",
+      "title": "Start fresh rebuild",
+      "harness": "workflow-authoring",
+      "model": "default",
+      "baselineWorkflow": "workflows/haiku-explain-workflow.json",
+      "input": {
+        "request": "Clear the workflow and start fresh with one @executioncontrolprotocol/chrome-ai.generate step that writes a haiku."
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "stepCount",
+            "exact": 1
+          },
+          {
+            "kind": "stepUses",
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "wf-patch-15",
+      "suite": "workflow-patch",
+      "title": "Clear steps keep I/O",
+      "harness": "workflow-authoring",
+      "model": "default",
+      "baselineWorkflow": "workflows/generate-accepts-returns-workflow.json",
+      "input": {
+        "request": "Clear the steps but keep accepts and returns."
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "stepCount",
+            "exact": 0
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "prompt"
+            ]
+          },
+          {
+            "kind": "workflowReturnsHasProperties",
+            "properties": [
+              "response"
+            ]
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
     }
   ]
 }

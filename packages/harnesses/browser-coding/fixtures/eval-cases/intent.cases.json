@@ -582,6 +582,39 @@
           "requireApproved": true
         }
       }
+    },
+    {
+      "id": "intent-18",
+      "suite": "intent",
+      "title": "Clear all steps",
+      "harness": "intent-classification",
+      "model": "default",
+      "input": {
+        "message": "Remove all steps and start fresh."
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "intent",
+            "value": "workflow-patch"
+          },
+          {
+            "kind": "descriptorListsExtensions",
+            "ids": [
+              "@executioncontrolprotocol/format-toon",
+              "@executioncontrolprotocol/format-eql",
+              "@executioncontrolprotocol/format-json",
+              "@executioncontrolprotocol/test"
+            ]
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
     }
   ]
 }
