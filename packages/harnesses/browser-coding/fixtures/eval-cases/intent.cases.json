@@ -615,6 +615,230 @@
           "enabled": false
         }
       }
+    },
+    {
+      "id": "coding-intent-probe-layers-01",
+      "suite": "intent",
+      "title": "Probe Photoshop layers before authoring",
+      "harness": "intent-classification",
+      "model": "default",
+      "input": {
+        "message": "Inspect the Photoshop layers before choosing which one the workflow should edit."
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "intent",
+            "value": "workflow-probe"
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "coding-intent-probe-structure-01",
+      "suite": "intent",
+      "title": "Probe document structure first",
+      "harness": "intent-classification",
+      "model": "default",
+      "input": {
+        "message": "Discover the document structure first, then let me select a layer."
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "intent",
+            "value": "workflow-probe"
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "coding-intent-clarify-headline-01",
+      "suite": "intent",
+      "title": "Clarify with Headline selection",
+      "harness": "intent-classification",
+      "model": "default",
+      "input": {
+        "message": "Use the Headline layer.",
+        "probeContext": {
+          "probeId": "probe-1",
+          "domain": "photoshop-layers",
+          "summary": "PSD has Headline and Logo layers",
+          "options": [
+            {
+              "id": "layer-headline",
+              "label": "Headline"
+            },
+            {
+              "id": "layer-logo",
+              "label": "Logo"
+            }
+          ]
+        }
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "intent",
+            "value": "workflow-clarify"
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "coding-intent-clarify-logo-01",
+      "suite": "intent",
+      "title": "Clarify with Logo option id",
+      "harness": "intent-classification",
+      "model": "default",
+      "input": {
+        "message": "Pick layer-logo for the next step.",
+        "probeContext": {
+          "probeId": "probe-1",
+          "domain": "photoshop-layers",
+          "summary": "PSD has Headline and Logo layers",
+          "options": [
+            {
+              "id": "layer-headline",
+              "label": "Headline"
+            },
+            {
+              "id": "layer-logo",
+              "label": "Logo"
+            }
+          ]
+        }
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "intent",
+            "value": "workflow-clarify"
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "coding-intent-create-not-probe-01",
+      "suite": "intent",
+      "title": "Explicit create is not probe",
+      "harness": "intent-classification",
+      "model": "default",
+      "input": {
+        "message": "Create a workflow that edits the Headline layer."
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "intent",
+            "value": "workflow-create"
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "coding-intent-faq-not-clarify-01",
+      "suite": "intent",
+      "title": "Probe FAQ is not clarify",
+      "harness": "intent-classification",
+      "model": "default",
+      "input": {
+        "message": "How does workflow probing work?"
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "intent",
+            "value": "faq"
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "coding-intent-probe-ambiguous-01",
+      "suite": "intent",
+      "title": "Ambiguous discovery request probes first",
+      "harness": "intent-classification",
+      "model": "default",
+      "input": {
+        "message": "Inspect what is in this Photoshop document before I decide what to automate."
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "intent",
+            "value": "workflow-probe"
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "coding-intent-probe-multilingual-01",
+      "suite": "intent",
+      "title": "Spanish layer discovery probes first",
+      "harness": "intent-classification",
+      "model": "default",
+      "input": {
+        "message": "Descubre las capas del documento antes de crear el flujo."
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "intent",
+            "value": "workflow-probe"
+          }
+        ],
+        "judge": {
+          "enabled": true,
+          "goal": "Intent should be workflow-probe",
+          "requireApproved": true
+        }
+      }
     }
   ]
 }

@@ -11,9 +11,9 @@ const nanoLoader = createNodeEvalFixturesLoader({
 })
 
 describe("loadEvalCasesFromDir", () => {
-  it("loads 101 cases across suites from harness-owned fixtures", () => {
-    expect(nanoLoader.loadEvalCases().length).toBe(101)
-    expect(nanoLoader.countEvalCases()).toBe(101)
+  it("loads 116 cases across suites from harness-owned fixtures", () => {
+    expect(nanoLoader.loadEvalCases().length).toBe(116)
+    expect(nanoLoader.countEvalCases()).toBe(116)
   })
 
   it("loads workflow-create suite", () => {

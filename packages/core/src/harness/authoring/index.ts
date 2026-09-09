@@ -97,6 +97,8 @@ export {
   buildAssistantSafeReply,
   buildAuthoringFailureReply,
   tryBuildChangeSummaryReply,
+  tryBuildProbeOfferReply,
+  tryBuildClarifyOptionsReply,
   tryBuildRunContextReply,
   tryBuildFaqReply,
   tryBuildEnvironmentReply,
@@ -111,3 +113,10 @@ export {
   chatResultWorkflow,
   chatResultSuggestedAction,
 } from "./chat-result.js"
+export {
+  summarizeProbeContext,
+  probeOptionsFromPhotoshopManifest,
+  buildPhotoshopLayersProbeContext,
+  messageSelectsProbeOptions,
+  PROBE_CONTEXT_OPTION_PROMPT_LIMIT,
+} from "./summarize-probe-context.js"

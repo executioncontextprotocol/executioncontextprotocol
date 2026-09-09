@@ -14,7 +14,6 @@ import {
   coerceIntentEqlRawOutput,
   buildContextBundle,
   correctClassifiedIntent,
-  formatIntentRoutingHintLines,
 } from "@executioncontrolprotocol/core"
 import {
   ECP_INTENT_SCHEMA,
@@ -108,7 +107,7 @@ const evalsIntentClassificationHarness = defineHarness("@executioncontrolprotoco
     })
 
     const buildPrompt = (repairDialogLines: string[] = []) => {
-      const lines = [...contextBundle.lines, ...formatIntentRoutingHintLines(input.message)]
+      const lines = [...contextBundle.lines]
       lines.push(`User message: ${input.message}`)
       if (repairDialogLines.length > 0) {
         lines.push(...repairDialogLines)

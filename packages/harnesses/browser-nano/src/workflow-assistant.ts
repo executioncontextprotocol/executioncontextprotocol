@@ -28,6 +28,7 @@ import {
   ECP_HARNESS_REPLY_SCHEMA,
   ECP_MODEL_GENERATE_INTERFACE,
   ecpIntentSchema,
+  probeContextSchema,
   harnessEvaluateOutputSchema,
   harnessRunContextSchema,
   LATEST_ECP_VERSION,
@@ -38,6 +39,7 @@ import {
   type HarnessPromptPhase,
   type HarnessReply,
   type HarnessRunContext,
+  type ProbeContext,
   type ValidationResult,
   type WorkflowManifest,
 } from "@executioncontrolprotocol/types"
@@ -92,6 +94,7 @@ const harnessInputSchema = z.object({
   workflow: z.record(z.string(), z.unknown()).optional(),
   classifiedIntent: ecpIntentSchema.optional(),
   conversationSummary: z.string().optional(),
+  probeContext: probeContextSchema.optional(),
 })
 
 function formatReplyAsEql(reply: HarnessReply): string {
@@ -147,6 +150,7 @@ export const evalsWorkflowAssistantHarness = defineHarness("@executioncontrolpro
           ? (input.runContext as HarnessRunContext)
           : undefined,
       conversationSummary: input.conversationSummary,
+      probeContext: input.probeContext,
       includeEnvironmentDescriptor: config.context.includeEnvironmentDescriptor,
       includeEncodedDescriptor:
         config.context.includeEncodedDescriptor || envQuestion,
@@ -365,6 +369,7 @@ export async function invokeWorkflowAssistant(
     model?: string
     classifiedIntent?: EcpIntent
     conversationSummary?: string
+    probeContext?: ProbeContext
   },
   ctx: HarnessCapabilityContext<Record<string, unknown>>
 ): Promise<HarnessEvaluateOutput> {

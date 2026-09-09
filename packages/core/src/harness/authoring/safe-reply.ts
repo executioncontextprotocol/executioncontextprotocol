@@ -304,6 +304,50 @@ export function tryBuildChangeSummaryReply(
 }
 
 /**
+ * Deterministic summary after authoring a discovery prefix, with offer-probe.
+ * @category Harness
+ */
+export function tryBuildProbeOfferReply(
+  baseline: WorkflowManifest | undefined,
+  authored: WorkflowManifest
+): HarnessReply {
+  const after = summarizeWorkflowManifest(authored)
+  const stepList =
+    after.steps.length === 0
+      ? "no steps"
+      : after.steps.map((s) => s.id).join(", ")
+  const changeLine = baseline
+    ? `I updated the workflow discovery prefix (${stepList}).`
+    : `I drafted a discovery prefix for "${after.workflowLabel ?? after.workflowId}" (${stepList}).`
+  return {
+    schema: ECP_HARNESS_REPLY_SCHEMA,
+    answer: `${changeLine} Want me to run the probe so we can inspect the results before finishing?`,
+    suggestedAction: ECP_HARNESS_REPLY_ACTIONS.OFFER_PROBE,
+  }
+}
+
+/**
+ * Ask the user to pick among probe options when clarify has context but no clear selection.
+ * @category Harness
+ */
+export function tryBuildClarifyOptionsReply(probe: {
+  summary: string
+  options: Array<{ id: string; label: string }>
+}): HarnessReply {
+  const listed =
+    probe.options.length === 0
+      ? "(no options available yet)"
+      : probe.options
+          .slice(0, 12)
+          .map((o) => `- ${o.label} (id=${o.id})`)
+          .join("\n")
+  return {
+    schema: ECP_HARNESS_REPLY_SCHEMA,
+    answer: `${probe.summary}\n\nWhich options should we use?\n${listed}`,
+  }
+}
+
+/**
  * Conversational fallback when authoring fails — never offers run.
  * @category Harness
  */

@@ -15,10 +15,26 @@ describe("coding multi-shot chat helpers", () => {
     expect(cfg.trace).toBeDefined()
   })
 
-  it("routes create/patch intents to authoring", () => {
+  it("routes create/patch/probe intents to authoring", () => {
     expect(intentRoutesToAuthoring(ECP_INTENT_VALUES.WORKFLOW_CREATE)).toBe(true)
     expect(intentRoutesToAuthoring(ECP_INTENT_VALUES.WORKFLOW_PATCH)).toBe(true)
+    expect(intentRoutesToAuthoring(ECP_INTENT_VALUES.WORKFLOW_PROBE)).toBe(true)
+    expect(intentRoutesToAuthoring(ECP_INTENT_VALUES.WORKFLOW_CLARIFY)).toBe(false)
     expect(intentRoutesToAuthoring(ECP_INTENT_VALUES.FAQ)).toBe(false)
+  })
+
+  it("extracts offer-probe suggestedAction from chat results", () => {
+    expect(
+      chatResultSuggestedAction({
+        artifact: {
+          schema: "@executioncontrolprotocol.harness.reply",
+          answer: "Want me to run the probe?",
+          suggestedAction: "offer-probe",
+        },
+        raw: "",
+        trace: { harness: "@executioncontrolprotocol/harness-browser-coding" },
+      })
+    ).toBe("offer-probe")
   })
 
   it("extracts answer, suggestedAction, and workflow from chat results", () => {

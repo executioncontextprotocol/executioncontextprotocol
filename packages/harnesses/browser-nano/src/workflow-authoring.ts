@@ -40,6 +40,7 @@ import {
   ECP_MODEL_GENERATE_INTERFACE,
   ecpIntentSchema,
   harnessEvaluateOutputSchema,
+  probeContextSchema,
   type EcpPatchInput,
   type EcpPatchDocument,
   type EcpIntent,
@@ -47,6 +48,7 @@ import {
   type HarnessInvokeResult,
   type HarnessOperationFeedback,
   type HarnessPromptPhase,
+  type ProbeContext,
   type WorkflowManifest,
 } from "@executioncontrolprotocol/types"
 import { z } from "zod"
@@ -138,6 +140,7 @@ const harnessInputSchema = z.object({
   model: z.string().optional(),
   classifiedIntent: ecpIntentSchema.optional(),
   conversationSummary: z.string().optional(),
+  probeContext: probeContextSchema.optional(),
 })
 
 /**
@@ -185,6 +188,7 @@ const evalsWorkflowAuthoringHarness = defineHarness("@executioncontrolprotocol",
       intent: input.classifiedIntent?.intent ?? (isPatch ? "workflow-patch" : "workflow-create"),
       manifest: baselineManifest,
       conversationSummary: input.conversationSummary,
+      probeContext: input.probeContext,
       includeEnvironmentDescriptor: config.context.includeEnvironmentDescriptor,
       includeEncodedDescriptor: config.context.includeEncodedDescriptor,
       descriptorFormat,
@@ -632,6 +636,7 @@ export async function invokeWorkflowAuthoring(
     model?: string
     classifiedIntent?: EcpIntent
     conversationSummary?: string
+    probeContext?: ProbeContext
   },
   ctx: HarnessCapabilityContext<Record<string, unknown>>
 ): Promise<HarnessEvaluateOutput> {

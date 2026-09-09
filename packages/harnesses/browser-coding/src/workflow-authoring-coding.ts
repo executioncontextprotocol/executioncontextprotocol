@@ -308,8 +308,16 @@ const codingWorkflowAuthoringHarness = defineHarness("@executioncontrolprotocol"
 
 /** Workflow authoring for Browser Coding harness. @category Harness */
 export async function invokeWorkflowAuthoringCoding(
-  input: { request: string; manifest?: unknown; model?: string },
+  input: {
+    request: string
+    manifest?: unknown
+    model?: string
+    probeContext?: unknown
+  },
   ctx: HarnessCapabilityContext<Record<string, unknown>>
 ): Promise<HarnessEvaluateOutput> {
-  return codingWorkflowAuthoringHarness.handler(input, ctx) as Promise<HarnessEvaluateOutput>
+  return codingWorkflowAuthoringHarness.handler(
+    { request: input.request, manifest: input.manifest, model: input.model },
+    ctx
+  ) as Promise<HarnessEvaluateOutput>
 }

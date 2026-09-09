@@ -9,7 +9,7 @@ Used by the browser demo and harness-owned eval matrices (Ollama gemma3:1b, Chro
 | Asset | Location |
 | ----- | -------- |
 | Prompt fixtures | `fixtures/harness-prompts/*.prompt.json` |
-| Eval cases | `fixtures/eval-cases/*.cases.json` (93 cases incl. chat + flow) |
+| Eval cases | `fixtures/eval-cases/*.cases.json` (116 cases incl. chat + flow) |
 | Support fixtures | `fixtures/workflows/`, `fixtures/runs/` |
 | Matrix tests | `test/eval/` (Ollama), `test/eval/browser/` (Chrome Nano) |
 
@@ -32,10 +32,12 @@ Tasks (all model outputs are **EQL** via `@executioncontrolprotocol/format-eql`)
 
 | Task | Role |
 | ---- | ---- |
-| **`chat`** | **Default** multi-shot orchestrator: unfiltered intent, then contextualized authoring or assistant |
+| **`chat`** | **Default** multi-shot orchestrator: unfiltered intent, then contextualized authoring or assistant (including probe → clarify → complete) |
 | `workflow-authoring` | Create or patch `@executioncontrolprotocol.workflow` via EQL |
-| `intent-classification` | Route user messages (`faq`, `general`, `workflow-create`, `workflow-patch`) |
+| `intent-classification` | Route user messages (`faq`, `general`, `workflow-create`, `workflow-patch`, `workflow-probe`, `workflow-clarify`) |
 | `workflow-assistant` | Unified assistant: ECP FAQ, identity, environment/capability help, run-aware Q&A (`@executioncontrolprotocol.harness.reply`) |
+
+**Probe loop:** `workflow-probe` authors a discovery prefix and returns `suggestedAction: offer-probe`. After the host runs a test-session `runTo` and supplies `probeContext`, `workflow-clarify` lists or applies option selections, then patches remaining steps and offers `offer-run`. Pass `probeContext` on the `chat` task input.
 
 **1B model policy:** normalize garbled EQL, deterministic assistant/patch recovery, then repair loop (`HARNESS_NANO_REPAIR`). Eval matrix and browser demo share this binding.
 

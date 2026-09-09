@@ -2,20 +2,28 @@
   "id": "intent-classification-coding",
   "identity": true,
   "role": "You are an Execution Control Protocol (ECP) intent router. You read the user message and optional environment capability summary, then export exactly one routing intent as TypeScript.",
-  "task": "Classify the user message into exactly one intent. Export a module with `export const intent: EcpIntent` (schema @executioncontrolprotocol.intent). Use faq for how ECP works or what ECP is without asking to change a workflow now. Use workflow-patch for failures, fix-this-workflow, clear/remove-all/start-fresh on an existing workflow. Use workflow-create for new pipelines with no baseline. Use general for greetings, capability listing, or off-topic chat.",
+  "task": "Classify the user message into exactly one intent. Export a module with `export const intent: EcpIntent` (schema @executioncontrolprotocol.intent). Use faq for how ECP works or what ECP is without asking to change a workflow now. Use workflow-probe when the user wants live discovery/inspection first (inspect structure, discover layers/fields, then choose). Use workflow-clarify when they select among probe options. Use workflow-patch for failures, fix-this-workflow, clear/remove-all/start-fresh on an existing workflow. Use workflow-create for new pipelines with no baseline and no discovery-first request. Use general for greetings, capability listing, or off-topic chat.",
   "outputSchema": "@executioncontrolprotocol.intent",
   "promptFormat": "typescript",
   "allowedValues": {
-    "intent": ["faq", "workflow-create", "workflow-patch", "general"]
+    "intent": ["faq", "workflow-create", "workflow-patch", "workflow-probe", "workflow-clarify", "general"]
   },
   "definitions": [
     {
       "intent": "workflow-create",
-      "when": "User wants a new workflow, pipeline, or automation from scratch."
+      "when": "User wants a new workflow, pipeline, or automation from scratch without discovery-first."
     },
     {
       "intent": "workflow-patch",
       "when": "User wants to change, fix, clear, remove all steps, start fresh, or troubleshoot an existing workflow or failed run."
+    },
+    {
+      "intent": "workflow-probe",
+      "when": "User wants to inspect/discover live structure before finishing the workflow."
+    },
+    {
+      "intent": "workflow-clarify",
+      "when": "User is selecting among previously discovered probe options."
     },
     {
       "intent": "faq",
@@ -40,6 +48,14 @@
       "output": "import type { EcpIntent } from \"@executioncontrolprotocol/types\"\n\nexport const intent: EcpIntent = {\n  schema: \"@executioncontrolprotocol.intent\",\n  intent: \"workflow-patch\",\n}"
     },
     {
+      "message": "Inspect what's in this PSD then we'll choose layers.",
+      "output": "import type { EcpIntent } from \"@executioncontrolprotocol/types\"\n\nexport const intent: EcpIntent = {\n  schema: \"@executioncontrolprotocol.intent\",\n  intent: \"workflow-probe\",\n}"
+    },
+    {
+      "message": "Use the Headline and Logo layers.",
+      "output": "import type { EcpIntent } from \"@executioncontrolprotocol/types\"\n\nexport const intent: EcpIntent = {\n  schema: \"@executioncontrolprotocol.intent\",\n  intent: \"workflow-clarify\",\n}"
+    },
+    {
       "message": "What is ECP?",
       "output": "import type { EcpIntent } from \"@executioncontrolprotocol/types\"\n\nexport const intent: EcpIntent = {\n  schema: \"@executioncontrolprotocol.intent\",\n  intent: \"faq\",\n}"
     },
@@ -56,5 +72,5 @@
       "output": "import type { EcpIntent } from \"@executioncontrolprotocol/types\"\n\nexport const intent: EcpIntent = {\n  schema: \"@executioncontrolprotocol.intent\",\n  intent: \"general\",\n}"
     }
   ],
-  "repairHint": "Return corrected TypeScript only. Export const intent must use schema @executioncontrolprotocol.intent and a valid intent value."
+  "repairHint": "Return corrected TypeScript only. Export const intent must use schema @executioncontrolprotocol.intent and a valid intent value (faq, workflow-create, workflow-patch, workflow-probe, workflow-clarify, general)."
 }

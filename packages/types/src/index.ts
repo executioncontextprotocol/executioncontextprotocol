@@ -138,6 +138,12 @@ export type {
 export { ECP_INTENT_SCHEMA, ECP_INTENT_VALUES, ecpIntentSchema } from "./intent.js"
 export type { EcpIntentValue, EcpIntent } from "./intent.js"
 export {
+  PROBE_CONTEXT_DOMAINS,
+  probeContextSchema,
+  probeOptionSchema,
+} from "./probe-context.js"
+export type { ProbeContext, ProbeOption } from "./probe-context.js"
+export {
   harnessRunContextSchema,
   runResultSchema,
   stepRunRecordSchema,

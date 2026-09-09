@@ -67,7 +67,10 @@ export function chatResultSuggestedAction(
     return undefined
   }
   const action = result.artifact.suggestedAction
-  if (action === ECP_HARNESS_REPLY_ACTIONS.OFFER_RUN) {
+  if (
+    action === ECP_HARNESS_REPLY_ACTIONS.OFFER_RUN ||
+    action === ECP_HARNESS_REPLY_ACTIONS.OFFER_PROBE
+  ) {
     return action
   }
   return undefined

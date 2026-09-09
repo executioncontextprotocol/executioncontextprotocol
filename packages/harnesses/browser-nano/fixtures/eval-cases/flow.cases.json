@@ -576,6 +576,130 @@
           }
         }
       ]
+    },
+    {
+      "id": "flow-probe-clarify-complete-01",
+      "suite": "flow",
+      "title": "Probe then clarify and complete",
+      "model": "default",
+      "steps": [
+        {
+          "harness": "chat",
+          "input": {
+            "message": "Inspect the Photoshop layers before choosing which one to edit."
+          },
+          "assertions": {
+            "deterministic": [
+              {
+                "kind": "classifiedIntent",
+                "value": "workflow-probe"
+              },
+              {
+                "kind": "replyAction",
+                "value": "offer-probe"
+              }
+            ],
+            "judge": {
+              "enabled": false
+            }
+          }
+        },
+        {
+          "harness": "chat",
+          "input": {
+            "message": "Use the Headline layer and complete the workflow.",
+            "probeContext": {
+              "probeId": "probe-1",
+              "domain": "photoshop-layers",
+              "summary": "PSD has Headline and Logo layers",
+              "options": [
+                {
+                  "id": "layer-headline",
+                  "label": "Headline"
+                },
+                {
+                  "id": "layer-logo",
+                  "label": "Logo"
+                }
+              ]
+            }
+          },
+          "assertions": {
+            "deterministic": [
+              {
+                "kind": "classifiedIntent",
+                "value": "workflow-clarify"
+              },
+              {
+                "kind": "shotTask",
+                "shotIndex": 1,
+                "task": "workflow-authoring"
+              },
+              {
+                "kind": "replyAction",
+                "value": "offer-run"
+              },
+              {
+                "kind": "sidecarWorkflowSchema",
+                "value": "@executioncontrolprotocol.workflow"
+              }
+            ],
+            "judge": {
+              "enabled": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "flow-probe-not-create-01",
+      "suite": "flow",
+      "title": "Discovery request does not create immediately",
+      "model": "default",
+      "steps": [
+        {
+          "harness": "intent-classification",
+          "input": {
+            "message": "Discover the document structure first, then let me select a layer."
+          },
+          "assertions": {
+            "deterministic": [
+              {
+                "kind": "intent",
+                "value": "workflow-probe"
+              }
+            ],
+            "judge": {
+              "enabled": false
+            }
+          }
+        },
+        {
+          "harness": "chat",
+          "input": {
+            "message": "Discover the document structure first, then let me select a layer."
+          },
+          "assertions": {
+            "deterministic": [
+              {
+                "kind": "classifiedIntent",
+                "value": "workflow-probe"
+              },
+              {
+                "kind": "shotCount",
+                "value": 2
+              },
+              {
+                "kind": "replyAction",
+                "value": "offer-probe"
+              }
+            ],
+            "judge": {
+              "enabled": false
+            }
+          }
+        }
+      ]
     }
   ]
 }

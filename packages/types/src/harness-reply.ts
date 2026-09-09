@@ -14,6 +14,7 @@ export const ECP_HARNESS_REPLY_CITATION_KINDS = {
 /** Suggested UI action attached to a harness reply. @category Harness */
 export const ECP_HARNESS_REPLY_ACTIONS = {
   OFFER_RUN: "offer-run",
+  OFFER_PROBE: "offer-probe",
 } as const
 
 /** Suggested action literal union. @category Harness */
@@ -40,7 +41,9 @@ export const harnessReplySchema = z.object({
   /** Optional structured citations. */
   citations: z.array(harnessReplyCitationSchema).optional(),
   /** Optional suggested follow-up action for the host UI. */
-  suggestedAction: z.enum([ECP_HARNESS_REPLY_ACTIONS.OFFER_RUN]).optional(),
+  suggestedAction: z
+    .enum([ECP_HARNESS_REPLY_ACTIONS.OFFER_RUN, ECP_HARNESS_REPLY_ACTIONS.OFFER_PROBE])
+    .optional(),
 })
 
 /** Structured harness assistant reply type. @category Harness */

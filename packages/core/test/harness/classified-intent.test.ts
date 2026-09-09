@@ -31,6 +31,27 @@ describe("inferIntentFromMessageHeuristic", () => {
       "workflow-create"
     )
   })
+
+  it("maps discovery wording to workflow-probe", () => {
+    expect(
+      inferIntentFromMessageHeuristic("Inspect what's in this PSD then we'll choose layers.")
+    ).toBe("workflow-probe")
+    expect(
+      inferIntentFromMessageHeuristic("Discover structure first, then build the rest.")
+    ).toBe("workflow-probe")
+  })
+
+  it("maps selection follow-ups to workflow-clarify", () => {
+    expect(inferIntentFromMessageHeuristic("Use the Headline and Logo layers.")).toBe(
+      "workflow-clarify"
+    )
+  })
+
+  it("keeps FAQ and create distinct from probe/clarify", () => {
+    expect(inferIntentFromMessageHeuristic("How does workflow patching work?")).toBe("faq")
+    expect(inferIntentFromMessageHeuristic("Create an echo workflow")).toBe("workflow-create")
+    expect(inferIntentFromMessageHeuristic("Hello there")).toBe("general")
+  })
 })
 
 describe("coerceIntentEqlRawOutput", () => {

@@ -66,9 +66,13 @@
       "output": "PATCH WORKFLOW email-action\nUPDATE WORKFLOW\n  RETURNS\n    OUT email:object!\n    OUT actions:object!"
     },
     {
+      "message": "Use the Headline and Logo layers to add a create-composite step after manifest.",
+      "output": "PATCH WORKFLOW psd-composite\nADD STEP composite USES @executioncontrolprotocol/adobe-firefly-services.photoshop-create-composite AFTER manifest\n  LABEL \"Create Composite\"\n  WITH layers = [\"Headline\", \"Logo\"]\n  AS composite"
+    },
+    {
       "message": "Remove workflow returns with CLEAR RETURNS.",
       "output": "PATCH WORKFLOW email-from-notes\nUPDATE WORKFLOW\n  CLEAR RETURNS"
     }
   ],
-  "repairHint": "Return corrected @executioncontrolprotocol.patch EQL only. First line MUST be PATCH WORKFLOW <workflow-id>. Use UPDATE WORKFLOW for workflow label changes; UPDATE STEP for step label or input changes."
+  "repairHint": "Return corrected @executioncontrolprotocol.patch EQL only. First line MUST be PATCH WORKFLOW <workflow-id>. Use UPDATE WORKFLOW for workflow label changes; UPDATE STEP for step label or input changes. When Probe context is present, prefer option ids/labels from that list."
 }

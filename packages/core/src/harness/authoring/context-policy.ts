@@ -3,6 +3,7 @@ import type {
   EcpIntentValue,
   HarnessPromptPhase,
   HarnessRunContext,
+  ProbeContext,
   WorkflowManifest,
 } from "@executioncontrolprotocol/types"
 import { encodeForPrompt } from "./encode-prompt-text.js"
@@ -14,6 +15,7 @@ import {
   type CompactEnvironmentSummary,
   type EnvironmentSummaryFormat,
 } from "./summarize-environment.js"
+import { summarizeProbeContext } from "./summarize-probe-context.js"
 import { formatRunContextSummaryLines } from "./summarize-run-context.js"
 import { formatWorkflowSummaryLines } from "./summarize-workflow.js"
 
@@ -35,6 +37,8 @@ export interface ContextBundleOptions {
   manifest?: WorkflowManifest
   /** Run context for assistant-style bundles. */
   runContext?: HarnessRunContext
+  /** Live probe options for clarify / complete turns. */
+  probeContext?: ProbeContext
   /** Rolling conversation summary from the caller. */
   conversationSummary?: string
   /** Include environment descriptor block. */
@@ -83,10 +87,10 @@ function envFormatForIntent(
   if (!outputIsEql) {
     return "plain"
   }
-  if (intent === "workflow-create") {
+  if (intent === "workflow-create" || intent === "workflow-probe") {
     return "eql-create"
   }
-  if (intent === "workflow-patch" || isPatch) {
+  if (intent === "workflow-patch" || intent === "workflow-clarify" || isPatch) {
     return "eql-patch"
   }
   return "plain"
@@ -124,6 +128,8 @@ function shouldIncludeEnvironment(
   return (
     options.intent === "workflow-create" ||
     options.intent === "workflow-patch" ||
+    options.intent === "workflow-probe" ||
+    options.intent === "workflow-clarify" ||
     options.intent === "faq" ||
     options.intent === "general" ||
     envQuestion
@@ -136,6 +142,7 @@ function shouldIncludeRunContext(options: ContextBundleOptions): boolean {
   }
   return (
     options.intent === "workflow-patch" ||
+    options.intent === "workflow-clarify" ||
     options.intent === "faq" ||
     options.intent === "general"
   )
@@ -145,7 +152,25 @@ function shouldIncludeWorkflowSummary(options: ContextBundleOptions): boolean {
   if (options.phase === "unfiltered" || !options.manifest) {
     return false
   }
-  return options.intent === "workflow-patch" || options.intent === "faq" || options.intent === "general"
+  return (
+    options.intent === "workflow-patch" ||
+    options.intent === "workflow-probe" ||
+    options.intent === "workflow-clarify" ||
+    options.intent === "faq" ||
+    options.intent === "general"
+  )
+}
+
+function shouldIncludeProbeContext(options: ContextBundleOptions): boolean {
+  if (options.phase === "unfiltered" || !options.probeContext) {
+    return false
+  }
+  return (
+    options.intent === "workflow-clarify" ||
+    options.intent === "workflow-patch" ||
+    options.intent === "faq" ||
+    options.intent === "general"
+  )
 }
 
 /**
@@ -209,6 +234,13 @@ export async function buildContextBundle(
     const runLines = formatRunContextSummaryLines(options.runContext)
     if (runLines.length > 0) {
       lines.push("Run context (summary):", ...runLines, "")
+    }
+  }
+
+  if (shouldIncludeProbeContext(options) && options.probeContext) {
+    const probeLines = summarizeProbeContext(options.probeContext)
+    if (probeLines.length > 0) {
+      lines.push("Probe context:", ...probeLines, "")
     }
   }
 

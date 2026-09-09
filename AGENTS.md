@@ -229,7 +229,7 @@ Build order: `tsc -b tsconfig.build.json` (types → core → … → cli).
 
 ### Harness authoring surface
 
-Reusable harness helpers are exported from `@executioncontrolprotocol/core`: `defineHarness`, `runModelRepairLoop`, `buildSystemPrompt`, `summarizeEnvironmentDescriptor`, `formatStructuredRepairForModel`, `buildAssistantSafeReply`, etc. Shared task input Zod schemas live in `@executioncontrolprotocol/types` (`HARNESS_TASK_IDS`, `harnessWorkflowAssistantInputSchema`, …).
+Reusable harness helpers are exported from `@executioncontrolprotocol/core`: `defineHarness`, `runModelRepairLoop`, `buildSystemPrompt`, `summarizeEnvironmentDescriptor`, `formatStructuredRepairForModel`, `buildAssistantSafeReply`, `summarizeProbeContext`, `buildPhotoshopLayersProbeContext`, etc. Shared task input Zod schemas live in `@executioncontrolprotocol/types` (`HARNESS_TASK_IDS`, `harnessWorkflowAssistantInputSchema`, `probeContextSchema`, …).
 
 | Harness | Package | Id | Model surface | Eval profile |
 | ------- | ------- | -- | ------------- | ------------ |
@@ -237,6 +237,8 @@ Reusable harness helpers are exported from `@executioncontrolprotocol/core`: `de
 | Browser Coding | `@executioncontrolprotocol/harnesses-browser-coding` | `@executioncontrolprotocol/harness-browser-coding` | TypeScript (Fluent + typed intent/reply) | `ollama-qwen-coder-1.5b` (`qwen2.5-coder:1.5b`) — `pnpm run test:eval:matrix:coding` only |
 
 `compileHarnessArtifactSource` in `@executioncontrolprotocol/core/compile` evaluates intent/reply TS modules. Workflow create/patch use `compileWorkflowSource`. The **`workflow-assistant`** task is the unified assistant (ECP FAQ, identity, environment help, run Q&A). Optional `identity: true` on prompt fixtures prepends `ECP_ASSISTANT_IDENTITY_PRIMER`.
+
+**Probe → clarify → complete:** Chat intents `workflow-probe` and `workflow-clarify` drive a reusable discovery loop. Probe authors a prefix and suggests `offer-probe`; the host runs `ecp.test(…).runTo(cursor)`, builds domain-agnostic `ProbeContext` (Photoshop layers are the first exemplar via `buildPhotoshopLayersProbeContext`), then clarify turns select options and patch the remaining steps (`offer-run`). New domains add an adapter + prompt flavor — not new intents.
 
 ### Harness eval integrity
 

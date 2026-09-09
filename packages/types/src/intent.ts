@@ -5,6 +5,8 @@ export const ECP_INTENT_VALUES = {
   FAQ: "faq",
   WORKFLOW_CREATE: "workflow-create",
   WORKFLOW_PATCH: "workflow-patch",
+  WORKFLOW_PROBE: "workflow-probe",
+  WORKFLOW_CLARIFY: "workflow-clarify",
   GENERAL: "general",
 } as const
 
@@ -22,6 +24,8 @@ export const ecpIntentSchema = z.object({
     ECP_INTENT_VALUES.FAQ,
     ECP_INTENT_VALUES.WORKFLOW_CREATE,
     ECP_INTENT_VALUES.WORKFLOW_PATCH,
+    ECP_INTENT_VALUES.WORKFLOW_PROBE,
+    ECP_INTENT_VALUES.WORKFLOW_CLARIFY,
     ECP_INTENT_VALUES.GENERAL,
   ]),
   /** Optional topic bucket for contextualized reinjection (e.g. patching, echo-failure). */

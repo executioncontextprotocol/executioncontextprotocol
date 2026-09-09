@@ -195,6 +195,244 @@
           "enabled": false
         }
       }
+    },
+    {
+      "id": "coding-chat-probe-path-01",
+      "suite": "chat",
+      "title": "Probe path offers live discovery",
+      "harness": "chat",
+      "model": "default",
+      "input": {
+        "message": "Inspect the Photoshop layers before choosing which one to edit."
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "classifiedIntent",
+            "value": "workflow-probe"
+          },
+          {
+            "kind": "shotCount",
+            "value": 2
+          },
+          {
+            "kind": "shotTask",
+            "shotIndex": 1,
+            "task": "workflow-assistant"
+          },
+          {
+            "kind": "replySchema"
+          },
+          {
+            "kind": "replyAction",
+            "value": "offer-probe"
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "coding-chat-clarify-context-01",
+      "suite": "chat",
+      "title": "Clarify route uses probe context",
+      "harness": "chat",
+      "model": "default",
+      "input": {
+        "message": "Use the Headline layer.",
+        "probeContext": {
+          "probeId": "probe-1",
+          "domain": "photoshop-layers",
+          "summary": "PSD has Headline and Logo layers",
+          "options": [
+            {
+              "id": "layer-headline",
+              "label": "Headline"
+            },
+            {
+              "id": "layer-logo",
+              "label": "Logo"
+            }
+          ]
+        }
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "classifiedIntent",
+            "value": "workflow-clarify"
+          },
+          {
+            "kind": "shotCount",
+            "value": 3
+          },
+          {
+            "kind": "shotTask",
+            "shotIndex": 1,
+            "task": "workflow-authoring"
+          },
+          {
+            "kind": "replySchema"
+          },
+          {
+            "kind": "replyAction",
+            "value": "offer-run"
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "coding-chat-clarify-complete-01",
+      "suite": "chat",
+      "title": "Clarify selection completes workflow",
+      "harness": "chat",
+      "model": "default",
+      "input": {
+        "message": "Pick layer-logo and complete the workflow.",
+        "probeContext": {
+          "probeId": "probe-1",
+          "domain": "photoshop-layers",
+          "summary": "PSD has Headline and Logo layers",
+          "options": [
+            {
+              "id": "layer-headline",
+              "label": "Headline"
+            },
+            {
+              "id": "layer-logo",
+              "label": "Logo"
+            }
+          ]
+        }
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "classifiedIntent",
+            "value": "workflow-clarify"
+          },
+          {
+            "kind": "shotCount",
+            "value": 3
+          },
+          {
+            "kind": "shotTask",
+            "shotIndex": 2,
+            "task": "workflow-change-summary"
+          },
+          {
+            "kind": "replySchema"
+          },
+          {
+            "kind": "replyAction",
+            "value": "offer-run"
+          },
+          {
+            "kind": "sidecarWorkflowSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "coding-chat-create-no-probe-01",
+      "suite": "chat",
+      "title": "Explicit create offers run not probe",
+      "harness": "chat",
+      "model": "default",
+      "input": {
+        "message": "Create a workflow that edits the Headline layer."
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "classifiedIntent",
+            "value": "workflow-create"
+          },
+          {
+            "kind": "shotCount",
+            "value": 3
+          },
+          {
+            "kind": "replySchema"
+          },
+          {
+            "kind": "replyAction",
+            "value": "offer-run"
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "coding-chat-probe-gibberish-01",
+      "suite": "chat",
+      "title": "Gibberish after probe does not complete",
+      "harness": "chat",
+      "model": "default",
+      "input": {
+        "message": "asdf ???",
+        "probeContext": {
+          "probeId": "probe-1",
+          "domain": "photoshop-layers",
+          "summary": "PSD has Headline and Logo layers",
+          "options": [
+            {
+              "id": "layer-headline",
+              "label": "Headline"
+            },
+            {
+              "id": "layer-logo",
+              "label": "Logo"
+            }
+          ]
+        }
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "classifiedIntent",
+            "value": "general"
+          },
+          {
+            "kind": "shotCount",
+            "value": 2
+          },
+          {
+            "kind": "replySchema"
+          },
+          {
+            "kind": "replyActionAbsent"
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
+      }
     }
   ]
 }

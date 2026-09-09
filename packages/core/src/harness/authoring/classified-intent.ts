@@ -8,6 +8,8 @@ export const CLASSIFIED_INTENT_VALUES = [
   "faq",
   "workflow-create",
   "workflow-patch",
+  "workflow-probe",
+  "workflow-clarify",
   "general",
 ] as const satisfies readonly EcpIntentValue[]
 
@@ -51,6 +53,34 @@ export function inferIntentFromMessageHeuristic(message: string): EcpIntentValue
   }
   if (/who are you|what are you/i.test(msg)) {
     return "general"
+  }
+  // Probe: discover/inspect structure before finishing the workflow.
+  if (
+    /\b(inspect|discover|probe)\b/i.test(msg) &&
+    /\b(structure|layers?|manifest|fields?|assets?|what(?:'s| is) in)\b/i.test(msg)
+  ) {
+    return "workflow-probe"
+  }
+  if (
+    /\b(then|after)\b/i.test(msg) &&
+    /\b(choose|select|pick)\b/i.test(msg) &&
+    /\b(layer|field|option|variant)\b/i.test(msg)
+  ) {
+    return "workflow-probe"
+  }
+  if (
+    /\bdiscover structure first\b/i.test(msg) ||
+    /\binspect what(?:'s| is) in (?:this|the)\b/i.test(msg)
+  ) {
+    return "workflow-probe"
+  }
+  // Clarify: selecting among previously listed options (labels/ids).
+  if (
+    /\b(use|pick|choose|select)\b/i.test(msg) &&
+    /\b(layer|headline|logo|option|variant|field)\b/i.test(msg) &&
+    !/\b(create|build)\b.*\bworkflow\b/i.test(msg)
+  ) {
+    return "workflow-clarify"
   }
   if (/\bfailed\b/i.test(msg) && /\b(echo|workflow|step)\b/i.test(msg)) {
     return "workflow-patch"
@@ -108,6 +138,15 @@ export function deriveIntentTopicFallback(message: string, intent: EcpIntentValu
     if (/workflow/i.test(msg)) return "workflows"
     if (/ecp/i.test(msg)) return "ecp"
     return "ecp"
+  }
+  if (intent === "workflow-probe") {
+    if (/\blayer/i.test(msg)) return "photoshop-layers"
+    if (/\b(field|schema)\b/i.test(msg)) return "schema-fields"
+    return "workflow-probe"
+  }
+  if (intent === "workflow-clarify") {
+    if (/\blayer/i.test(msg)) return "layer-selection"
+    return "option-selection"
   }
   if (intent === "workflow-patch") {
     if (/\b(poem|generate)\b/i.test(msg)) return "generate-failure"
@@ -186,6 +225,12 @@ export function correctClassifiedIntent(message: string, intent: EcpIntent): Ecp
     value = "faq"
   } else if (value === "faq" && /what(?:'s| is) the weather/i.test(message)) {
     value = "general"
+  } else if (
+    (value === "workflow-create" || value === "workflow-patch") &&
+    /\b(inspect|discover|probe)\b/i.test(message) &&
+    /\b(structure|layers?|manifest)\b/i.test(message)
+  ) {
+    value = "workflow-probe"
   }
 
   const topic = canonicalizeIntentTopic(message, value, intent.topic)
@@ -202,53 +247,33 @@ export function formatClassifiedIntentBlock(intent: EcpIntent): string[] {
     lines.push(`Topic: ${intent.topic}`)
   }
   if (intent.summary) {
-    lines.push(`Request summary: ${intent.summary}`)
+    lines.push(`Summary: ${intent.summary}`)
   }
   return lines
 }
 
 /**
- * Deterministic routing hints for intent classification (unfiltered phase).
+ * Short routing hint lines for contextualized shots.
  * @category Harness
  */
-export function formatIntentRoutingHintLines(message: string): string[] {
-  const lines: string[] = []
-  if (/^how\s+(?:does|do)\b/i.test(message.trim()) && /\bwork\b/i.test(message)) {
-    lines.push(
-      "Routing hint: how-does questions about ECP features → INTENT faq (not workflow-patch)."
-    )
+export function formatIntentRoutingHintLines(intent: EcpIntentValue): string[] {
+  switch (intent) {
+    case "workflow-create":
+      return ["Route: author a new workflow from the user request."]
+    case "workflow-patch":
+      return ["Route: patch the existing workflow for the user request."]
+    case "workflow-probe":
+      return [
+        "Route: author a discovery prefix, then offer a live probe before finishing the workflow.",
+      ]
+    case "workflow-clarify":
+      return [
+        "Route: interpret the user's selection among probe options, then complete the workflow.",
+      ]
+    case "faq":
+      return ["Route: answer an ECP FAQ without changing the workflow."]
+    case "general":
+    default:
+      return ["Route: general assistant reply."]
   }
-  if (/^what is ecp\b/i.test(message.trim())) {
-    lines.push("Routing hint: definitional questions about ECP → INTENT faq.")
-  }
-  if (/^(hello|hi|bonjour|hola)\b/i.test(message.trim())) {
-    lines.push("Routing hint: greetings → INTENT general (not workflow-create).")
-  }
-  if (/tell me a joke/i.test(message)) {
-    lines.push("Routing hint: off-topic chat → INTENT general.")
-  }
-  if (/what extensions are available/i.test(message)) {
-    lines.push("Routing hint: capability inventory questions → INTENT general.")
-  }
-  if (/what (?:is the )?run status/i.test(message)) {
-    lines.push("Routing hint: run status questions → INTENT general.")
-  }
-  if (/^what can you do\??$/i.test(message.trim())) {
-    lines.push("Routing hint: assistant identity → INTENT general.")
-  }
-  if (
-    /\b(update|change|set)\b/i.test(message) &&
-    /\b(step|echo|summarize|validate|notify|translate)\b/i.test(message)
-  ) {
-    lines.push("Routing hint: changing an existing step → INTENT workflow-patch.")
-  }
-  if (isClearAllStepsRequest(message)) {
-    lines.push(
-      "Routing hint: clear / remove all / start fresh on an existing workflow → INTENT workflow-patch (keep workflow id; delete or rebuild steps)."
-    )
-  }
-  if (/\bfailed\b/i.test(message) && /\b(step|workflow|echo)\b/i.test(message)) {
-    lines.push("Routing hint: workflow failure symptom → INTENT workflow-patch.")
-  }
-  return lines
 }

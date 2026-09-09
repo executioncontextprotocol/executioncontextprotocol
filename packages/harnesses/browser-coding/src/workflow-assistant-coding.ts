@@ -404,8 +404,19 @@ export async function invokeWorkflowAssistantCoding(
     workflow?: Record<string, unknown>
     classifiedIntent?: { schema: string; intent: string; topic?: string; summary?: string }
     conversationSummary?: string
+    probeContext?: unknown
   },
   ctx: HarnessCapabilityContext<Record<string, unknown>>
 ): Promise<HarnessEvaluateOutput> {
-  return codingAssistantHarness.handler(input, ctx) as Promise<HarnessEvaluateOutput>
+  return codingAssistantHarness.handler(
+    {
+      message: input.message,
+      runContext: input.runContext,
+      model: input.model,
+      workflow: input.workflow,
+      classifiedIntent: input.classifiedIntent,
+      conversationSummary: input.conversationSummary,
+    },
+    ctx
+  ) as Promise<HarnessEvaluateOutput>
 }

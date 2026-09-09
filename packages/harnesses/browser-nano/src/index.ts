@@ -30,6 +30,7 @@ export {
   chatResultWorkflow,
   chatResultSuggestedAction,
   intentRoutesToAuthoring,
+  intentRoutesToClarify,
   invokeMultiShotChat,
   WORKFLOW_CHANGE_SUMMARY_SHOT_TASK,
 } from "./multi-shot-chat.js"
