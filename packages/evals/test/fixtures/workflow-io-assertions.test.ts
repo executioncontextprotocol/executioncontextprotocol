@@ -8,27 +8,27 @@ function workflowArtifact(overrides: Partial<WorkflowManifest["workflow"]> = {})
     schema: "@executioncontrolprotocol.workflow",
     version: "1.0",
     workflow: {
-      id: "echo-from-input",
-      label: "Echo from input",
+      id: "generate-from-prompt",
+      label: "Generate from prompt",
       accepts: {
         type: "object",
-        properties: { value: { type: "string" } },
-        required: ["value"],
+        properties: { prompt: { type: "string" } },
+        required: ["prompt"],
       },
       returns: {
         type: "object",
-        properties: { echo: { type: "object" } },
-        required: ["echo"],
+        properties: { response: { type: "object" } },
+        required: ["response"],
       },
       ...overrides,
     },
     steps: [
       {
         type: "step",
-        id: "echo",
-        uses: "@executioncontrolprotocol/test.echo",
-        input: { value: { $ref: "state.value" } },
-        as: "echo",
+        id: "generate",
+        uses: "@executioncontrolprotocol/chrome-ai.generate",
+        input: { prompt: { $ref: "state.prompt" } },
+        as: "response",
       },
     ],
   }
@@ -39,19 +39,19 @@ describe("workflow I/O eval assertions debug", () => {
   it("describes workflowAcceptsHasProperties", async () => {
     const assertion: DeterministicAssertion = {
       kind: "workflowAcceptsHasProperties",
-      properties: ["value"],
+      properties: ["prompt"],
     }
     const actual = await extractAssertionActual(assertion, workflowArtifact())
-    expect(actual).toContain("value")
+    expect(actual).toContain("prompt")
   })
 
   it("describes workflowAcceptsRefUsed", async () => {
     const assertion: DeterministicAssertion = {
       kind: "workflowAcceptsRefUsed",
-      property: "value",
+      property: "prompt",
     }
     const actual = await extractAssertionActual(assertion, workflowArtifact())
-    expect(actual).toContain("state.value")
+    expect(actual).toContain("state.prompt")
   })
 
   it("describes workflowReturnsAbsent when missing", async () => {
@@ -61,5 +61,16 @@ describe("workflow I/O eval assertions debug", () => {
       workflowArtifact({ returns: undefined })
     )
     expect(actual).toContain("absent")
+  })
+
+  it("describes workflowReturnsPropertyType", async () => {
+    const assertion: DeterministicAssertion = {
+      kind: "workflowReturnsPropertyType",
+      property: "response",
+      type: "object",
+    }
+    const actual = await extractAssertionActual(assertion, workflowArtifact())
+    expect(actual).toContain("response")
+    expect(actual).toContain("object")
   })
 })

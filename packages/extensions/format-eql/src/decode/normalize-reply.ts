@@ -1,4 +1,5 @@
 import {
+  ECP_HARNESS_REPLY_ACTIONS,
   ECP_HARNESS_REPLY_CITATION_KINDS,
   ECP_HARNESS_REPLY_SCHEMA,
   type HarnessReply,
@@ -6,8 +7,13 @@ import {
 import type { EqlReplyDoc } from "./ast.js"
 
 const citationKinds = new Set<string>(Object.values(ECP_HARNESS_REPLY_CITATION_KINDS))
+const replyActions = new Set<string>(Object.values(ECP_HARNESS_REPLY_ACTIONS))
 
 export function replyFromEql(doc: EqlReplyDoc): HarnessReply {
+  const suggestedAction =
+    doc.suggestedAction && replyActions.has(doc.suggestedAction)
+      ? (doc.suggestedAction as HarnessReply["suggestedAction"])
+      : undefined
   return {
     schema: ECP_HARNESS_REPLY_SCHEMA,
     answer: doc.answer,
@@ -20,5 +26,6 @@ export function replyFromEql(doc: EqlReplyDoc): HarnessReply {
           })),
         }
       : {}),
+    ...(suggestedAction ? { suggestedAction } : {}),
   }
 }

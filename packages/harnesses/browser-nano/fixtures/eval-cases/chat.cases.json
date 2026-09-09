@@ -3,12 +3,12 @@
     {
       "id": "chat-01",
       "suite": "chat",
-      "title": "Troubleshoot failure routes to patch",
+      "title": "Troubleshoot failure routes to patch with summary",
       "harness": "chat",
       "model": "default",
       "input": {
-        "message": "The workflow failed on echo, help me fix it.",
-        "manifestRef": "workflows/echo-workflow.json"
+        "message": "The workflow failed on poem, help me fix it.",
+        "manifestRef": "workflows/two-step-generate-chain.json"
       },
       "assertions": {
         "deterministic": [
@@ -21,7 +21,7 @@
           },
           {
             "kind": "shotCount",
-            "value": 2
+            "value": 3
           },
           {
             "kind": "promptPhase",
@@ -34,22 +34,41 @@
             "value": "contextualized"
           },
           {
+            "kind": "shotTask",
+            "shotIndex": 2,
+            "task": "workflow-change-summary"
+          },
+          {
+            "kind": "replySchema"
+          },
+          {
+            "kind": "replyAction",
+            "value": "offer-run"
+          },
+          {
+            "kind": "sidecarWorkflowSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
             "kind": "validationValid"
           }
         ],
         "judge": {
-          "enabled": false
+          "enabled": true,
+          "goal": "Summarizes the workflow fix and asks whether to run it",
+          "rubric": "One or two sentences about the change; asks to run; no markdown fences",
+          "requireApproved": true
         }
       }
     },
     {
       "id": "chat-02",
       "suite": "chat",
-      "title": "Create routing",
+      "title": "Create routing with change summary",
       "harness": "chat",
       "model": "default",
       "input": {
-        "message": "I need a new workflow with echo and summarize."
+        "message": "I need a new workflow with poem then summarize using generate."
       },
       "assertions": {
         "deterministic": [
@@ -62,15 +81,39 @@
           },
           {
             "kind": "shotCount",
-            "value": 2
+            "value": 3
           },
           {
-            "kind": "artifactSchema",
+            "kind": "shotTask",
+            "shotIndex": 1,
+            "task": "workflow-authoring"
+          },
+          {
+            "kind": "shotTask",
+            "shotIndex": 2,
+            "task": "workflow-change-summary"
+          },
+          {
+            "kind": "replySchema"
+          },
+          {
+            "kind": "replyAction",
+            "value": "offer-run"
+          },
+          {
+            "kind": "sidecarWorkflowSchema",
             "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "sidecarStepUses",
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
           }
         ],
         "judge": {
-          "enabled": false
+          "enabled": true,
+          "goal": "Summarizes creating poem/summarize workflow and asks to run",
+          "rubric": "Mentions the created steps and asks to run; no markdown fences",
+          "requireApproved": true
         }
       }
     },
@@ -102,6 +145,9 @@
           },
           {
             "kind": "replySchema"
+          },
+          {
+            "kind": "replyActionAbsent"
           }
         ],
         "judge": {
@@ -131,7 +177,14 @@
             "value": "faq"
           },
           {
+            "kind": "shotCount",
+            "value": 2
+          },
+          {
             "kind": "replySchema"
+          },
+          {
+            "kind": "replyActionAbsent"
           },
           {
             "kind": "answerContains",
@@ -166,7 +219,14 @@
             "value": "general"
           },
           {
+            "kind": "shotCount",
+            "value": 2
+          },
+          {
             "kind": "replySchema"
+          },
+          {
+            "kind": "replyActionAbsent"
           },
           {
             "kind": "answerContains",
@@ -184,12 +244,12 @@
     {
       "id": "chat-06",
       "suite": "chat",
-      "title": "Patch label change",
+      "title": "Patch label change with summary",
       "harness": "chat",
       "model": "default",
       "input": {
-        "message": "Change the echo step label to Patched Echo.",
-        "manifestRef": "workflows/echo-workflow.json"
+        "message": "Change the poem step label to Draft Poem.",
+        "manifestRef": "workflows/two-step-generate-chain.json"
       },
       "assertions": {
         "deterministic": [
@@ -201,11 +261,34 @@
             "value": "workflow-patch"
           },
           {
+            "kind": "shotCount",
+            "value": 3
+          },
+          {
+            "kind": "replySchema"
+          },
+          {
+            "kind": "replyAction",
+            "value": "offer-run"
+          },
+          {
+            "kind": "sidecarWorkflowSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "sidecarStepLabel",
+            "stepId": "poem",
+            "value": "Draft Poem"
+          },
+          {
             "kind": "validationValid"
           }
         ],
         "judge": {
-          "enabled": false
+          "enabled": true,
+          "goal": "Summarizes the poem label change and asks to run",
+          "rubric": "Mentions Draft Poem or label update; asks to run",
+          "requireApproved": true
         }
       }
     },
@@ -228,7 +311,14 @@
             "value": "general"
           },
           {
+            "kind": "shotCount",
+            "value": 2
+          },
+          {
             "kind": "replySchema"
+          },
+          {
+            "kind": "replyActionAbsent"
           },
           {
             "kind": "answerContains",
@@ -266,7 +356,14 @@
             "contains": "off-topic"
           },
           {
+            "kind": "shotCount",
+            "value": 2
+          },
+          {
             "kind": "replySchema"
+          },
+          {
+            "kind": "replyActionAbsent"
           },
           {
             "kind": "answerRedirectsToScope"
@@ -289,7 +386,7 @@
       "model": "default",
       "input": {
         "message": "What is the run status?",
-        "runContextFixture": "runs/failed-echo-step.json"
+        "runContextFixture": "runs/failed-generate-step.json"
       },
       "assertions": {
         "deterministic": [
@@ -304,6 +401,9 @@
             "kind": "replySchema"
           },
           {
+            "kind": "replyActionAbsent"
+          },
+          {
             "kind": "answerContains",
             "text": "fail"
           }
@@ -313,6 +413,85 @@
           "goal": "Reports failed run status",
           "rubric": "Mentions failed status from run context",
           "requireApproved": true
+        }
+      }
+    },
+    {
+      "id": "chat-10",
+      "suite": "chat",
+      "title": "Fix failed run with patch summary",
+      "harness": "chat",
+      "model": "default",
+      "input": {
+        "message": "The last workflow run failed. Diagnose the errors from the run context and patch the workflow to fix them.",
+        "manifestRef": "workflows/two-step-generate-chain.json",
+        "runContextFixture": "runs/failed-generate-step.json"
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "classifiedIntent",
+            "value": "workflow-patch"
+          },
+          {
+            "kind": "shotCount",
+            "value": 3
+          },
+          {
+            "kind": "replySchema"
+          },
+          {
+            "kind": "replyAction",
+            "value": "offer-run"
+          },
+          {
+            "kind": "sidecarWorkflowSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "answerContains",
+            "text": "run"
+          }
+        ],
+        "judge": {
+          "enabled": true,
+          "goal": "Summarizes a fix for the failed failed run and asks to run again",
+          "rubric": "Mentions a fix or update; asks to run; no markdown fences",
+          "requireApproved": true
+        }
+      }
+    },
+    {
+      "id": "chat-11",
+      "suite": "chat",
+      "title": "Gibberish stays assistant without offer-run",
+      "harness": "chat",
+      "model": "default",
+      "input": {
+        "message": "asdf qwerty ???",
+        "manifestRef": "workflows/two-step-generate-chain.json"
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "shotCount",
+            "value": 2
+          },
+          {
+            "kind": "replySchema"
+          },
+          {
+            "kind": "replyActionAbsent"
+          }
+        ],
+        "judge": {
+          "enabled": false
         }
       }
     }

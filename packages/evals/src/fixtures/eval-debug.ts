@@ -145,6 +145,8 @@ export function describeAssertionExpectation(assertion: DeterministicAssertion):
       return `some step input $ref targets state.${assertion.property}`
     case "workflowReturnsMapsAs":
       return `workflow.returns has property ${assertion.property} and step .as("${assertion.asKey}") exists`
+    case "workflowReturnsPropertyType":
+      return `workflow.returns.${assertion.property} has JSON Schema type ${assertion.type}`
     default:
       return JSON.stringify(assertion)
   }
@@ -309,6 +311,15 @@ export async function extractAssertionActual(
           .map((s) => ("as" in s ? s.as : undefined))
           .filter((k): k is string => typeof k === "string") ?? []
       return `returns properties = [${returnsProps.join(", ")}], step as keys = [${asKeys.join(", ")}]`
+    }
+    case "workflowReturnsPropertyType": {
+      const wf = asWorkflowManifest(artifact)
+      const field = jsonSchemaObjectProperties(
+        wf.workflow?.returns as Record<string, unknown> | undefined
+      ).find((p) => p.name === assertion.property)
+      const actualType =
+        typeof field?.schema.type === "string" ? field.schema.type : field ? "unknown" : "missing"
+      return `workflow.returns.${assertion.property} type = ${actualType}`
     }
     default:
       return JSON.stringify(artifact ?? null, null, 2).slice(0, 2000)

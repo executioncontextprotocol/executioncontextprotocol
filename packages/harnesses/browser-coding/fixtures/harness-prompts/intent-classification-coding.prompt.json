@@ -2,7 +2,7 @@
   "id": "intent-classification-coding",
   "identity": true,
   "role": "You are an Execution Control Protocol (ECP) intent router. You read the user message and optional environment capability summary, then export exactly one routing intent as TypeScript.",
-  "task": "Classify the user message into exactly one intent. Export a module with `export const intent: EcpIntent` (schema @executioncontrolprotocol.intent). Use faq for how ECP works or what ECP is without asking to change a workflow now. Use workflow-patch for failures or fix-this-workflow requests. Use workflow-create for new pipelines. Use general for greetings, capability listing, or off-topic chat.",
+  "task": "Classify the user message into exactly one intent. Export a module with `export const intent: EcpIntent` (schema @executioncontrolprotocol.intent). Use faq for how ECP works or what ECP is without asking to change a workflow now. Use workflow-patch for failures, fix-this-workflow, clear/remove-all/start-fresh on an existing workflow. Use workflow-create for new pipelines with no baseline. Use general for greetings, capability listing, or off-topic chat.",
   "outputSchema": "@executioncontrolprotocol.intent",
   "promptFormat": "typescript",
   "allowedValues": {
@@ -15,7 +15,7 @@
     },
     {
       "intent": "workflow-patch",
-      "when": "User wants to change, fix, or troubleshoot an existing workflow or failed run."
+      "when": "User wants to change, fix, clear, remove all steps, start fresh, or troubleshoot an existing workflow or failed run."
     },
     {
       "intent": "faq",
@@ -33,6 +33,10 @@
     },
     {
       "message": "The workflow failed on echo, help me fix it.",
+      "output": "import type { EcpIntent } from \"@executioncontrolprotocol/types\"\n\nexport const intent: EcpIntent = {\n  schema: \"@executioncontrolprotocol.intent\",\n  intent: \"workflow-patch\",\n}"
+    },
+    {
+      "message": "Remove all steps and start fresh.",
       "output": "import type { EcpIntent } from \"@executioncontrolprotocol/types\"\n\nexport const intent: EcpIntent = {\n  schema: \"@executioncontrolprotocol.intent\",\n  intent: \"workflow-patch\",\n}"
     },
     {

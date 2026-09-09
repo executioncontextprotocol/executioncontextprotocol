@@ -62,6 +62,10 @@ export {
   recoverStructuredPatchFromRequest,
   type StructuredPatchRecoveryContext,
 } from "./recover-structured-patch.js"
+export {
+  isClearAllStepsRequest,
+  isClearAndRebuildRequest,
+} from "./patch-clear-intent.js"
 export { normalizeIntentEqlRawOutput, coerceIntentEqlRawOutput } from "./normalize-intent-eql-output.js"
 export {
   repairWorkflowJsonSyntax,
@@ -91,6 +95,8 @@ export {
 export {
   answerRedirectsToHarnessScope,
   buildAssistantSafeReply,
+  buildAuthoringFailureReply,
+  tryBuildChangeSummaryReply,
   tryBuildRunContextReply,
   tryBuildFaqReply,
   tryBuildEnvironmentReply,
@@ -100,3 +106,8 @@ export {
   HARNESS_ASSISTANT_SAFE_REPLY_MESSAGE,
   HARNESS_ASSISTANT_SCOPE_REDIRECT_PHRASE,
 } from "./safe-reply.js"
+export {
+  chatResultAnswer,
+  chatResultWorkflow,
+  chatResultSuggestedAction,
+} from "./chat-result.js"

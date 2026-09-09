@@ -1,4 +1,4 @@
-import type { RunResult, WorkflowManifest } from "@executioncontrolprotocol/types"
+import type { RunResult, ValidationIssue, WorkflowManifest } from "@executioncontrolprotocol/types"
 import {
   pickWorkflowReturns,
   validateAgainstJsonSchema,
@@ -17,9 +17,11 @@ export function validateWorkflowAcceptsInput(
   return { ok: false, message: `Workflow accepts validation failed: ${result.errors.join("; ")}` }
 }
 
+const RETURNS_VALIDATION_CODE = "WORKFLOW_RETURNS_INVALID"
+
 /**
  * Attach `output` from `workflow.returns` and validate required properties.
- * Invalid returns mark the run failed.
+ * Invalid returns mark the run failed and attach run-level diagnostics.
  * @category Schema
  */
 export function applyWorkflowReturns(
@@ -35,9 +37,16 @@ export function applyWorkflowReturns(
 
   const check = validateAgainstJsonSchema(manifest.workflow.returns, output)
   if (!check.ok) {
+    const diagnostics: ValidationIssue[] = check.errors.map((message) => ({
+      code: RETURNS_VALIDATION_CODE,
+      message: `Workflow returns validation failed: ${message}`,
+      severity: "error" as const,
+      path: "workflow.returns",
+    }))
     return {
       ...next,
       run: { ...result.run, status: "failed" },
+      diagnostics,
     }
   }
   return next

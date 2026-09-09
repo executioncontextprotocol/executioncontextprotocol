@@ -173,6 +173,7 @@ export function formatWorkflowSummaryEqlLines(
       "- Return PATCH WORKFLOW plus only UPDATE WORKFLOW / UPDATE STEP / ADD STEP / DELETE STEP / MOVE STEP operations.",
       "- Steps listed above already exist: UPDATE or DELETE them; do not ADD STEP with the same id.",
       "- ADD STEP keeps all existing steps unless you also DELETE STEP.",
+      "- Remove all / clear / start fresh → DELETE STEP once for every listed step id (empty workflows are valid).",
       "- Do not output a full WORKFLOW document or re-list unchanged steps as STEP lines."
     )
     return lines

@@ -1,0 +1,33 @@
+{
+  "schema": "@executioncontrolprotocol.workflow",
+  "version": "1.0",
+  "workflow": {
+    "id": "haiku-explain",
+    "label": "Haiku Explain"
+  },
+  "steps": [
+    {
+      "type": "step",
+      "id": "haiku",
+      "label": "Write Haiku",
+      "uses": "@executioncontrolprotocol/ollama.generate",
+      "input": {
+        "prompt": "Write a haiku."
+      },
+      "as": "haiku"
+    },
+    {
+      "type": "step",
+      "id": "explain",
+      "label": "Explain Haiku",
+      "uses": "@executioncontrolprotocol/ollama.generate",
+      "input": {
+        "prompt": "Explain what the following haiku means:",
+        "context": {
+          "$ref": "state.haiku.text"
+        }
+      },
+      "as": "explain"
+    }
+  ]
+}

@@ -86,6 +86,36 @@ ADD STEP translate USES @executioncontrolprotocol/test.translate AFTER echo
   WITH text = REF echo.output
   AS translate`)
   })
+
+  it("rebuilds DELETE for every step on remove-all", () => {
+    expect(
+      recoverStructuredPatchFromRequest("PATCH WORKFLOW haiku-explain\nUPDATE WORKFLOW", {
+        request: "Remove all steps from the workflow.",
+        workflowId: "haiku-explain",
+        stepIds: ["haiku", "explain"],
+      })
+    ).toBe(`PATCH WORKFLOW haiku-explain
+DELETE STEP haiku
+DELETE STEP explain`)
+  })
+
+  it("rebuilds clear-all then ADD on start-fresh with capability", () => {
+    expect(
+      recoverStructuredPatchFromRequest("PATCH WORKFLOW haiku-explain\nDELETE STEP haiku", {
+        request:
+          "Clear the workflow and start fresh with one @executioncontrolprotocol/chrome-ai.generate step that writes a haiku.",
+        workflowId: "haiku-explain",
+        stepIds: ["haiku", "explain"],
+        capabilityIds: ["@executioncontrolprotocol/chrome-ai.generate"],
+      })
+    ).toBe(`PATCH WORKFLOW haiku-explain
+DELETE STEP haiku
+DELETE STEP explain
+ADD STEP generate USES @executioncontrolprotocol/chrome-ai.generate
+  LABEL "Generate"
+  WITH prompt = "Write a haiku."
+  AS generate`)
+  })
 })
 
 describe("synthesizeCreateEqlFromRequiredCapabilities", () => {

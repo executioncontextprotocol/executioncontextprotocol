@@ -37,12 +37,16 @@ describe("renderWorkflowToFluent", () => {
     expect(source).toContain('.id("collect")')
   })
 
-  it("renders echo-workflow with stable step .id for coding patch baselines", () => {
-    const raw = readFileSync(path.join(workflowFixturesRoot, "echo-workflow.json"), "utf8")
+  it("renders haiku-explain workflow with stable step .id for coding patch baselines", () => {
+    const raw = readFileSync(
+      path.join(workflowFixturesRoot, "haiku-explain-workflow.json"),
+      "utf8"
+    )
     const manifest = JSON.parse(raw) as WorkflowManifest
     const source = renderWorkflowToFluent(manifest)
-    expect(source).toContain('.id("echo")')
-    expect(source).toContain('.id("echo-test")')
+    expect(source).toContain('.id("haiku")')
+    expect(source).toContain('.id("explain")')
+    expect(source).toContain('.id("haiku-explain")')
   })
 
   it("generated Fluent source compiles back to manifest", async () => {

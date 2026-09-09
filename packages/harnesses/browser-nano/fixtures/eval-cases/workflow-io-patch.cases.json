@@ -3,22 +3,39 @@
     {
       "id": "wf-patch-io-01",
       "suite": "workflow-patch",
-      "title": "Add ACCEPTS to echo workflow",
+      "title": "Add ACCEPTS to generate chain",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/echo-workflow.json",
+      "baselineWorkflow": "workflows/two-step-generate-chain.json",
       "input": {
-        "request": "PATCH WORKFLOW echo-test: add ACCEPTS WITH value:string! and UPDATE STEP echo WITH value = REF value."
+        "request": "PATCH WORKFLOW poem-summarize: add ACCEPTS WITH topic:string! and UPDATE STEP poem WITH prompt = REF topic."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowAcceptsHasProperties", "properties": ["value"] },
-          { "kind": "workflowAcceptsRefUsed", "property": "value" }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "topic"
+            ]
+          },
+          {
+            "kind": "workflowAcceptsRefUsed",
+            "property": "topic"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     },
     {
@@ -27,19 +44,37 @@
       "title": "Add RETURNS to accepts workflow",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/echo-accepts-workflow.json",
+      "baselineWorkflow": "workflows/generate-accepts-workflow.json",
       "input": {
-        "request": "Add RETURNS OUT echo:object! to workflow echo-accepts."
+        "request": "Add RETURNS OUT response:object! to workflow generate-accepts."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowReturnsHasProperties", "properties": ["echo"] },
-          { "kind": "workflowReturnsMapsAs", "property": "echo", "asKey": "echo" }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "workflowReturnsHasProperties",
+            "properties": [
+              "response"
+            ]
+          },
+          {
+            "kind": "workflowReturnsMapsAs",
+            "property": "response",
+            "asKey": "response"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     },
     {
@@ -48,18 +83,32 @@
       "title": "Change RETURNS property",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/echo-accepts-returns-workflow.json",
+      "baselineWorkflow": "workflows/generate-accepts-returns-workflow.json",
       "input": {
-        "request": "Change RETURNS OUT echo:object! to OUT result:object! on workflow echo-from-input."
+        "request": "Change RETURNS OUT response:object! to OUT result:object! on workflow generate-from-prompt."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowReturnsHasProperties", "properties": ["result"] }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "workflowReturnsHasProperties",
+            "properties": [
+              "result"
+            ]
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     },
     {
@@ -68,19 +117,35 @@
       "title": "CLEAR RETURNS",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/echo-accepts-returns-workflow.json",
+      "baselineWorkflow": "workflows/generate-accepts-returns-workflow.json",
       "input": {
-        "request": "Remove workflow returns with CLEAR RETURNS but keep ACCEPTS value."
+        "request": "Remove workflow returns with CLEAR RETURNS but keep ACCEPTS prompt."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowAcceptsHasProperties", "properties": ["value"] },
-          { "kind": "workflowReturnsAbsent" }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "prompt"
+            ]
+          },
+          {
+            "kind": "workflowReturnsAbsent"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     },
     {
@@ -89,19 +154,36 @@
       "title": "Rename ACCEPTS property",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/echo-accepts-returns-workflow.json",
+      "baselineWorkflow": "workflows/generate-accepts-returns-workflow.json",
       "input": {
-        "request": "Rename ACCEPTS field value to message and UPDATE STEP echo WITH value = REF message."
+        "request": "Rename ACCEPTS field prompt to message and UPDATE STEP generate WITH prompt = REF message."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowAcceptsHasProperties", "properties": ["message"] },
-          { "kind": "workflowAcceptsRefUsed", "property": "message" }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "message"
+            ]
+          },
+          {
+            "kind": "workflowAcceptsRefUsed",
+            "property": "message"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     },
     {
@@ -110,20 +192,47 @@
       "title": "Preserve I/O on label patch",
       "harness": "workflow-authoring",
       "model": "default",
-      "baselineWorkflow": "workflows/echo-accepts-returns-workflow.json",
+      "baselineWorkflow": "workflows/generate-accepts-returns-workflow.json",
       "input": {
-        "request": "Change echo step label to Patched Echo only."
+        "request": "Change generate step label to Patched Generate only."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "stepLabel", "stepId": "echo", "value": "Patched Echo" },
-          { "kind": "workflowAcceptsHasProperties", "properties": ["value"] },
-          { "kind": "workflowReturnsHasProperties", "properties": ["echo"] }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "stepLabel",
+            "stepId": "generate",
+            "value": "Patched Generate"
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "prompt"
+            ]
+          },
+          {
+            "kind": "workflowReturnsHasProperties",
+            "properties": [
+              "response"
+            ]
+          },
+          {
+            "kind": "stepUses",
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     }
   ]

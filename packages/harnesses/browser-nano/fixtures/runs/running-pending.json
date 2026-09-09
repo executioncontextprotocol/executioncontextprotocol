@@ -3,9 +3,9 @@
     "schema": "@executioncontrolprotocol.run.result",
     "version": "1.0",
     "run": { "id": "run-started", "status": "started" },
-    "state": { "pendingStep": "echo" },
+    "state": { "pendingStep": "poem" },
     "history": {
-      "echo": {
+      "poem": {
         "status": "started",
         "attempts": 1
       }

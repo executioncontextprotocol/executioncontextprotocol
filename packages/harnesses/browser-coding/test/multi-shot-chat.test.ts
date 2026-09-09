@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest"
 import { intentRoutesToAuthoring } from "@executioncontrolprotocol/harnesses-browser-nano"
 import { ECP_INTENT_VALUES } from "@executioncontrolprotocol/types"
 import { getHarnessCodingConfig, HARNESS_TASKS } from "../src/harness-coding-config.js"
-import { chatResultAnswer, chatResultWorkflow } from "../src/multi-shot-chat.js"
+import {
+  chatResultAnswer,
+  chatResultSuggestedAction,
+  chatResultWorkflow,
+} from "../src/multi-shot-chat.js"
 
 describe("coding multi-shot chat helpers", () => {
   it("exposes chat task config", () => {
@@ -17,7 +21,7 @@ describe("coding multi-shot chat helpers", () => {
     expect(intentRoutesToAuthoring(ECP_INTENT_VALUES.FAQ)).toBe(false)
   })
 
-  it("extracts answer and workflow from chat results", () => {
+  it("extracts answer, suggestedAction, and workflow from chat results", () => {
     expect(
       chatResultAnswer({
         artifact: { schema: "@executioncontrolprotocol.harness.reply", answer: "hello" },
@@ -26,8 +30,24 @@ describe("coding multi-shot chat helpers", () => {
       })
     ).toBe("hello")
     expect(
+      chatResultSuggestedAction({
+        artifact: {
+          schema: "@executioncontrolprotocol.harness.reply",
+          answer: "Updated. Want me to run it?",
+          suggestedAction: "offer-run",
+        },
+        raw: "",
+        trace: { harness: "@executioncontrolprotocol/harness-browser-coding" },
+      })
+    ).toBe("offer-run")
+    expect(
       chatResultWorkflow({
         artifact: {
+          schema: "@executioncontrolprotocol.harness.reply",
+          answer: "Updated.",
+          suggestedAction: "offer-run",
+        },
+        workflow: {
           schema: "@executioncontrolprotocol.workflow",
           version: "1.0",
           workflow: { id: "w", label: "W" },
@@ -37,5 +57,17 @@ describe("coding multi-shot chat helpers", () => {
         trace: { harness: "@executioncontrolprotocol/harness-browser-coding" },
       })?.workflow.id
     ).toBe("w")
+    expect(
+      chatResultWorkflow({
+        artifact: {
+          schema: "@executioncontrolprotocol.workflow",
+          version: "1.0",
+          workflow: { id: "legacy", label: "Legacy" },
+          steps: [],
+        },
+        raw: "",
+        trace: { harness: "@executioncontrolprotocol/harness-browser-coding" },
+      })?.workflow.id
+    ).toBe("legacy")
   })
 })

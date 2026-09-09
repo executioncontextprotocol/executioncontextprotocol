@@ -16,20 +16,29 @@ export const reply: HarnessReply = {
 
 const WORKFLOW_TEMPLATE = `import { workflow, step, ref } from "@executioncontrolprotocol/core"
 
-export default workflow("Echo from input")
-  .id("echo-from-input")
+export default workflow("Chrome generate from prompt")
+  .id("chrome-generate-from-prompt")
   .accepts({
     type: "object",
-    properties: { value: { type: "string" } },
-    required: ["value"],
+    properties: { prompt: { type: "string" } },
+    required: ["prompt"],
   })
   .returns({
     type: "object",
-    properties: { echo: { type: "object" } },
-    required: ["echo"],
+    properties: {
+      response: {
+        type: "object",
+        properties: { text: { type: "string" } },
+        required: ["text"],
+      },
+    },
+    required: ["response"],
   })
   .run([
-    step("@executioncontrolprotocol/test.echo", "Echo").id("echo").with({ value: ref("value") }).as("echo"),
+    step("@executioncontrolprotocol/chrome-ai.generate", "Generate")
+      .id("generate")
+      .with({ prompt: ref("prompt") })
+      .as("response"),
   ])`
 
 /**
@@ -55,6 +64,11 @@ export function typescriptPrimerForOutputSchema(outputSchema: string): string {
           "Use .id(\"stepId\") on steps when ids must stay stable across edits.",
           "Chain .accepts({...}) and .returns({...}) before .run() for workflow I/O schemas.",
           "Wire accepts keys with ref(\"key\") — not ref(\"step.output\") for run input.",
+          ".as(\"key\") stores the entire capability output under state.key.",
+          "A .returns property that maps to an .as key must match that capability output type.",
+          "Model *.generate outputs are objects with text — type returns as object (not string); chain with ref(\"prior.text\").",
+          "When editing an existing workflow: keep workflow .id(); remove one step by omitting it from .run([...]).",
+          "Remove all / clear / start fresh → .run([]) or rebuild .run([...]) with only the new steps; keep .accepts()/.returns() unless asked to clear I/O.",
           "Never output the word typescript on its own line before imports.",
         ]
       : []

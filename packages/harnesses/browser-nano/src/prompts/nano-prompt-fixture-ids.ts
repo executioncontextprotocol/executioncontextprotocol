@@ -4,6 +4,7 @@ export const NANO_PROMPT_FIXTURE_IDS = {
   WORKFLOW_AUTHORING_CREATE: "workflow-authoring-create",
   WORKFLOW_AUTHORING_PATCH: "workflow-authoring-patch",
   WORKFLOW_ASSISTANT: "workflow-assistant",
+  WORKFLOW_CHANGE_SUMMARY: "workflow-change-summary",
 } as const
 
 /** Browser Nano harness prompt fixture id union. @category Harness */

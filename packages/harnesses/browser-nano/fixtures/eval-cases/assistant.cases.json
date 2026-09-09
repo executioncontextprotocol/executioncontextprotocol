@@ -3,12 +3,12 @@
     {
       "id": "asst-01",
       "suite": "assistant",
-      "title": "Failed echo",
+      "title": "Failed generate",
       "harness": "workflow-assistant",
       "model": "default",
       "input": {
-        "message": "Why did step echo fail?",
-        "runContextFixture": "runs/failed-echo-step.json"
+        "message": "Why did step poem fail?",
+        "runContextFixture": "runs/failed-generate-step.json"
       },
       "assertions": {
         "deterministic": [
@@ -20,7 +20,7 @@
           },
           {
             "kind": "answerContains",
-            "text": "echo"
+            "text": "poem"
           },
           {
             "kind": "answerContains",
@@ -29,8 +29,8 @@
         ],
         "judge": {
           "enabled": true,
-          "goal": "Explains echo failure",
-          "rubric": "Mentions echo step and describes the error from run context",
+          "goal": "Explains generate failure",
+          "rubric": "Mentions poem step and describes the error from run context",
           "requireApproved": true
         }
       }
@@ -43,7 +43,7 @@
       "model": "default",
       "input": {
         "message": "What is the run status?",
-        "runContextFixture": "runs/failed-echo-step.json"
+        "runContextFixture": "runs/failed-generate-step.json"
       },
       "assertions": {
         "deterministic": [
@@ -129,7 +129,7 @@
       "model": "default",
       "input": {
         "message": "What steps are in the workflow?",
-        "runContextFixture": "runs/failed-echo-step.json"
+        "runContextFixture": "runs/failed-generate-step.json"
       },
       "assertions": {
         "deterministic": [
@@ -152,8 +152,8 @@
       "harness": "workflow-assistant",
       "model": "default",
       "input": {
-        "message": "How can I fix the echo error?",
-        "runContextFixture": "runs/failed-echo-step.json"
+        "message": "How can I fix the poem error?",
+        "runContextFixture": "runs/failed-generate-step.json"
       },
       "assertions": {
         "deterministic": [
@@ -165,7 +165,7 @@
           },
           {
             "kind": "citationStepId",
-            "value": "echo"
+            "value": "poem"
           }
         ],
         "judge": {
@@ -182,7 +182,7 @@
       "harness": "workflow-assistant",
       "model": "default",
       "input": {
-        "message": "What did the echo step produce?",
+        "message": "What did the poem step produce?",
         "runContextFixture": "runs/completed-with-refs.json"
       },
       "assertions": {
@@ -207,7 +207,7 @@
       "model": "default",
       "input": {
         "message": "Explain the failure politely.",
-        "runContextFixture": "runs/failed-echo-step.json"
+        "runContextFixture": "runs/failed-generate-step.json"
       },
       "assertions": {
         "deterministic": [
@@ -225,7 +225,7 @@
         "judge": {
           "enabled": true,
           "goal": "Professional helpful tone",
-          "rubric": "Polite explanation of the echo error with actionable guidance",
+          "rubric": "Polite explanation of the generate error with actionable guidance",
           "requireApproved": true
         }
       }
@@ -237,8 +237,8 @@
       "harness": "workflow-assistant",
       "model": "default",
       "input": {
-        "message": "Should we patch step echo input?",
-        "runContextFixture": "runs/failed-echo-step.json"
+        "message": "Should we patch step poem input?",
+        "runContextFixture": "runs/failed-generate-step.json"
       },
       "assertions": {
         "deterministic": [
@@ -252,7 +252,7 @@
         "judge": {
           "enabled": true,
           "goal": "Confirm patch",
-          "rubric": "Affirms patching echo step input when appropriate",
+          "rubric": "Affirms patching poem step input when appropriate",
           "requireApproved": true
         }
       }
@@ -276,13 +276,13 @@
           },
           {
             "kind": "answerContains",
-            "text": "test.echo"
+            "text": "chrome-ai.generate"
           }
         ],
         "judge": {
           "enabled": true,
           "goal": "Capabilities list",
-          "rubric": "Names concrete step capability ids such as test.echo",
+          "rubric": "Names concrete step capability ids such as chrome-ai.generate",
           "requireApproved": true
         }
       }
@@ -396,7 +396,7 @@
           },
           {
             "kind": "answerContains",
-            "text": "test.echo"
+            "text": "chrome-ai.generate"
           }
         ],
         "judge": {

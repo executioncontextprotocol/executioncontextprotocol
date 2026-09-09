@@ -116,7 +116,15 @@ export function sanitizePatchEqlRawOutput(raw: string): string {
 
   trimmed = trimmed.replace(
     /@executioncontrolprotocol\/demo\.echo\b/g,
-    "@executioncontrolprotocol/test.echo"
+    "@executioncontrolprotocol/chrome-ai.generate"
+  )
+  trimmed = trimmed.replace(
+    /@executioncontrolprotocol\/test\.echo\b/g,
+    "@executioncontrolprotocol/chrome-ai.generate"
+  )
+  trimmed = trimmed.replace(
+    /@executioncontrolprotocol\/demo\.summarize\b/g,
+    "@executioncontrolprotocol/chrome-ai.generate"
   )
   trimmed = trimmed.replace(/^(DELETE|ADD|MOVE)\s+STEP\s+(\w+)\)\s*$/gim, "$1 STEP $2")
 

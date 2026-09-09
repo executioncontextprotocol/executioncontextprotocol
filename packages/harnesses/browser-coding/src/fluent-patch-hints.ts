@@ -1,7 +1,14 @@
-import { collectModelOutputFeedback, jsonSchemaObjectProperties, type CompactEnvironmentSummary } from "@executioncontrolprotocol/core"
+import {
+  collectModelOutputFeedback,
+  jsonSchemaObjectProperties,
+  isClearAllStepsRequest,
+  isClearAndRebuildRequest,
+  type CompactEnvironmentSummary,
+} from "@executioncontrolprotocol/core"
 import {
   inferPatchTargetStepId,
   inferRequiredCapabilityIds,
+  collectGenerateReturnsTypeFeedback,
 } from "@executioncontrolprotocol/harnesses-browser-nano"
 import type { HarnessOperationFeedback, StepNode, WorkflowManifest } from "@executioncontrolprotocol/types"
 
@@ -100,17 +107,41 @@ export function buildFluentPatchHintLines(
   const lines = [
     FLUENT_ANTI_PATTERNS,
     `Keep workflow .id("${workflowId}") on export default workflow(...).`,
-    `Preserve every existing step .id(...) for ids: ${stepIds.join(", ") || "none"}.`,
+    isClearAllStepsRequest(request)
+      ? `Clear-all request: rebuild .run([...]) without baseline step ids (${stepIds.join(", ") || "none"}).`
+      : `Preserve every existing step .id(...) for ids: ${stepIds.join(", ") || "none"}.`,
     "Return a complete revised module: import { workflow, step, ref } from \"@executioncontrolprotocol/core\" when using ref().",
     "Edit rules:",
     "- label or input on an existing step → change that step only; keep .id(\"<stepId>\") unchanged.",
     "- remove/delete a step → rebuild .run([...]) without that step.",
+    "- remove all / clear / start fresh → .run([]) or rebuild with only new steps; keep .id() and I/O unless asked to clear them.",
     "- add a capability → append step(...) to .run([...]); use ref(\"priorStep.output\") when chaining.",
     "- move/reorder → reorder entries inside .run([...]); do not invent move helpers.",
     "- workflow label → change workflow(\"New label\") and keep .id(\"...\").",
   ]
 
-  if (moveMatch) {
+  if (isClearAllStepsRequest(request)) {
+    lines.push(
+      stepIds.length > 0
+        ? `Omit every baseline step id from .run([...]): ${stepIds.join(", ")}.`
+        : "Workflow already has no steps — keep .run([])."
+    )
+    if (isClearAndRebuildRequest(request)) {
+      const required =
+        capabilityIds !== undefined
+          ? inferRequiredCapabilityIds(request, capabilityIds)
+          : []
+      if (required[0]) {
+        lines.push(
+          `Then include only the new step("${required[0]}", ...).id(...) entries in .run([...]).`
+        )
+      } else {
+        lines.push("Then include only the newly requested steps in .run([...]).")
+      }
+    } else {
+      lines.push("Use .run([]) when the request leaves no steps.")
+    }
+  } else if (moveMatch) {
     const stepId = moveMatch[1]!
     const relation = moveMatch[2]!.toLowerCase()
     const anchorId = moveMatch[3]!
@@ -221,11 +252,12 @@ export function collectFluentPatchGoalFeedback(
   const moveMatch = request.match(
     /\bmove\s+(?:the\s+)?(\w+)\s+(?:step\s+)?(?:to\s+run\s+)?(after|before)\s+(\w+)/i
   )
+  const clearAll = isClearAllStepsRequest(request)
 
   for (const stepId of baselineStepIds) {
     const isRemoveTarget =
       removeMatch?.[1] === stepId && /\bremove\b|\bdelete\b/i.test(lower)
-    if (isRemoveTarget) continue
+    if (clearAll || isRemoveTarget) continue
     const still = patched.steps?.find((s) => s.id === stepId)
     if (!still) {
       feedback.push(
@@ -236,7 +268,23 @@ export function collectFluentPatchGoalFeedback(
     }
   }
 
-  if (removeMatch) {
+  if (clearAll) {
+    const remaining = flatStepIds(patched)
+    if (remaining.length > 0 && !isClearAndRebuildRequest(request)) {
+      feedback.push(
+        collectModelOutputFeedback(
+          `Request clears all steps but .run([...]) still has: ${remaining.join(", ")}. Use .run([]).`
+        )
+      )
+    }
+    if (isClearAndRebuildRequest(request) && remaining.length > 1) {
+      feedback.push(
+        collectModelOutputFeedback(
+          `Start-fresh rebuild should omit every baseline step id (${baselineStepIds.join(", ")}) and keep only the new steps.`
+        )
+      )
+    }
+  } else if (removeMatch) {
     const stepId = removeMatch[1]!
     const still = patched.steps?.find((s) => s.id === stepId)
     if (still) {
@@ -482,6 +530,9 @@ export function collectFluentPatchGoalFeedback(
     }
   }
 
+  const typeFeedback = collectGenerateReturnsTypeFeedback(patched, "fluent")
+  if (typeFeedback) feedback.push(...typeFeedback)
+
   return feedback.length > 0 ? feedback : undefined
 }
 
@@ -493,11 +544,12 @@ export function collectCreateWorkflowIoFeedback(
   request: string,
   manifest: WorkflowManifest
 ): HarnessOperationFeedback[] | undefined {
+  const typeFeedback = collectGenerateReturnsTypeFeedback(manifest, "fluent") ?? []
   const lower = request.toLowerCase()
   if (!/\baccepts?\b|\breturns?\b|\brun\s+input\b/i.test(lower)) {
-    return undefined
+    return typeFeedback.length > 0 ? typeFeedback : undefined
   }
-  const feedback: HarnessOperationFeedback[] = []
+  const feedback: HarnessOperationFeedback[] = [...typeFeedback]
   const acceptsProp = inferAcceptsPropertyFromRequest(request)
   const returnsProp = inferReturnsPropertyFromRequest(request)
   const acceptsNames = workflowIoNames(manifest, "accepts")

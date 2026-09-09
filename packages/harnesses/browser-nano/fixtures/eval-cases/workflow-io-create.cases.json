@@ -3,21 +3,42 @@
     {
       "id": "wf-create-io-01",
       "suite": "workflow-create",
-      "title": "ACCEPTS value with REF from input",
+      "title": "ACCEPTS prompt with REF from input",
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create WORKFLOW echo-from-input with ACCEPTS WITH value:string! and STEP echo USES @executioncontrolprotocol/test.echo with WITH value = REF value."
+        "request": "Create WORKFLOW generate-from-prompt with ACCEPTS WITH prompt:string! and STEP generate USES @executioncontrolprotocol/chrome-ai.generate with WITH prompt = REF prompt."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowAcceptsHasProperties", "properties": ["value"] },
-          { "kind": "workflowAcceptsRefUsed", "property": "value" }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "stepUses",
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "prompt"
+            ]
+          },
+          {
+            "kind": "workflowAcceptsRefUsed",
+            "property": "prompt"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     },
     {
@@ -27,18 +48,45 @@
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create echo-from-input workflow with ACCEPTS value:string!, RETURNS OUT echo:object!, echo step AS echo wired from REF value."
+        "request": "Create generate-from-prompt workflow with ACCEPTS prompt:string!, RETURNS OUT response:object!, generate step AS response wired from REF prompt using @executioncontrolprotocol/chrome-ai.generate."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowAcceptsHasProperties", "properties": ["value"] },
-          { "kind": "workflowReturnsHasProperties", "properties": ["echo"] },
-          { "kind": "workflowReturnsMapsAs", "property": "echo", "asKey": "echo" }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "stepUses",
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "prompt"
+            ]
+          },
+          {
+            "kind": "workflowReturnsHasProperties",
+            "properties": [
+              "response"
+            ]
+          },
+          {
+            "kind": "workflowReturnsMapsAs",
+            "property": "response",
+            "asKey": "response"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     },
     {
@@ -48,18 +96,42 @@
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create two-step workflow with ACCEPTS prompt:string!, echo then summarize; echo uses REF prompt and summarize uses REF echo.output."
+        "request": "Create two-step workflow with ACCEPTS prompt:string!, first @executioncontrolprotocol/chrome-ai.generate step uses REF prompt AS poem, second generate step summarizes with REF poem.text."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowAcceptsHasProperties", "properties": ["prompt"] },
-          { "kind": "workflowAcceptsRefUsed", "property": "prompt" },
-          { "kind": "stepCount", "min": 2 }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "prompt"
+            ]
+          },
+          {
+            "kind": "workflowAcceptsRefUsed",
+            "property": "prompt"
+          },
+          {
+            "kind": "stepCount",
+            "min": 2
+          },
+          {
+            "kind": "stepUses",
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     },
     {
@@ -69,17 +141,35 @@
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create workflow with ACCEPTS value:string!, RETURNS OUT echo:object!, echo step AS echo with REF value input."
+        "request": "Create workflow with ACCEPTS prompt:string!, RETURNS OUT response:object!, @executioncontrolprotocol/chrome-ai.generate step AS response with REF prompt input."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowReturnsHasProperties", "properties": ["echo"] },
-          { "kind": "workflowReturnsMapsAs", "property": "echo", "asKey": "echo" }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "workflowReturnsHasProperties",
+            "properties": [
+              "response"
+            ]
+          },
+          {
+            "kind": "workflowReturnsMapsAs",
+            "property": "response",
+            "asKey": "response"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     },
     {
@@ -89,16 +179,34 @@
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create workflow with ACCEPTS WITH count:number! and echo step wired from REF count."
+        "request": "Create workflow with ACCEPTS WITH count:number! and @executioncontrolprotocol/chrome-ai.generate step that includes REF count in the prompt."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowAcceptsHasProperties", "properties": ["count"] }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "count"
+            ]
+          },
+          {
+            "kind": "stepUses",
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
       }
     },
     {
@@ -108,18 +216,98 @@
       "harness": "workflow-authoring",
       "model": "default",
       "input": {
-        "request": "Create single echo step workflow with ACCEPTS value:string! and no RETURNS block."
+        "request": "Create single @executioncontrolprotocol/chrome-ai.generate step workflow with ACCEPTS prompt:string! and no RETURNS block."
       },
       "assertions": {
         "deterministic": [
-          { "kind": "invokeSuccess" },
-          { "kind": "artifactSchema", "value": "@executioncontrolprotocol.workflow" },
-          { "kind": "validationValid" },
-          { "kind": "workflowAcceptsHasProperties", "properties": ["value"] },
-          { "kind": "workflowReturnsAbsent" },
-          { "kind": "stepCount", "exact": 1 }
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "prompt"
+            ]
+          },
+          {
+            "kind": "workflowReturnsAbsent"
+          },
+          {
+            "kind": "stepCount",
+            "exact": 1
+          },
+          {
+            "kind": "stepUses",
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
+          }
         ],
-        "judge": { "enabled": false }
+        "judge": {
+          "enabled": false
+        }
+      }
+    },
+    {
+      "id": "wf-create-io-07",
+      "suite": "workflow-create",
+      "title": "Chrome AI generate ACCEPTS and object RETURNS",
+      "harness": "workflow-authoring",
+      "model": "default",
+      "input": {
+        "request": "Create chrome-generate-from-prompt with ACCEPTS prompt:string!, one STEP using @executioncontrolprotocol/chrome-ai.generate AS response wired from REF prompt, and RETURNS OUT response:object!."
+      },
+      "assertions": {
+        "deterministic": [
+          {
+            "kind": "invokeSuccess"
+          },
+          {
+            "kind": "artifactSchema",
+            "value": "@executioncontrolprotocol.workflow"
+          },
+          {
+            "kind": "validationValid"
+          },
+          {
+            "kind": "stepUses",
+            "capabilityId": "@executioncontrolprotocol/chrome-ai.generate"
+          },
+          {
+            "kind": "workflowAcceptsHasProperties",
+            "properties": [
+              "prompt"
+            ]
+          },
+          {
+            "kind": "workflowAcceptsRefUsed",
+            "property": "prompt"
+          },
+          {
+            "kind": "workflowReturnsHasProperties",
+            "properties": [
+              "response"
+            ]
+          },
+          {
+            "kind": "workflowReturnsMapsAs",
+            "property": "response",
+            "asKey": "response"
+          },
+          {
+            "kind": "workflowReturnsPropertyType",
+            "property": "response",
+            "type": "object"
+          }
+        ],
+        "judge": {
+          "enabled": false
+        }
       }
     }
   ]

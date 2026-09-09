@@ -87,7 +87,7 @@ Matrix evals bind **formatters and test workflow stubs** only (no memory/storage
 | `@executioncontrolprotocol/format-toon` | Legacy descriptor encoding (optional; matrix uses plain-text + EQL grammar in prompts) |
 | `@executioncontrolprotocol/format-eql` | Harness model output (workflow, patch, intent, reply) — headerless |
 | `@executioncontrolprotocol/format-json` | Run context encoding (core formatter, explicit binding) |
-| `@executioncontrolprotocol/test` | `@executioncontrolprotocol/test.echo` and stub ops (`summarize`, `translate`, `notify`, `validate`) in workflow prompts |
+| `@executioncontrolprotocol/chrome-ai` / `@executioncontrolprotocol/ollama` | Generate capabilities used in harness workflow prompts and fixtures |
 
 Legacy smoke environments use `@executioncontrolprotocol/format-toon` + `@executioncontrolprotocol/test` only.
 

@@ -279,4 +279,30 @@ describe("jsonSchema helpers", () => {
     expect(result.output).toEqual({ "inspected.metadata": { aspectRatio: 1.5 } })
     expect(result.run.status).toBe("completed")
   })
+
+  it("applyWorkflowReturns fails with diagnostics when returns type mismatches", () => {
+    const manifest = workflow("String out")
+      .returns({
+        type: "object",
+        properties: {
+          response: { type: "string" },
+        },
+        required: ["response"],
+      })
+      .run([])
+      .toManifest()
+    const result = applyWorkflowReturns(
+      manifest,
+      {
+        schema: "@executioncontrolprotocol.run.result",
+        version: "1.0",
+        run: { id: "r1", status: "completed" },
+      },
+      { response: { text: "hello" } }
+    )
+    expect(result.run.status).toBe("failed")
+    expect(result.output).toEqual({ response: { text: "hello" } })
+    expect(result.diagnostics?.[0]?.code).toBe("WORKFLOW_RETURNS_INVALID")
+    expect(result.diagnostics?.[0]?.message).toMatch(/expected type string/i)
+  })
 })

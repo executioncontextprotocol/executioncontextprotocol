@@ -1,4 +1,5 @@
 import { isGarbledPatchEqlOutput } from "./normalize-patch-eql-output.js"
+import { isClearAllStepsRequest, isClearAndRebuildRequest } from "./patch-clear-intent.js"
 
 /** Context for rebuilding patch EQL from an unambiguous user request. @category Harness */
 export interface StructuredPatchRecoveryContext {
@@ -119,6 +120,9 @@ function recoverDeleteStepPatch(
   workflowId: string,
   stepIds: readonly string[]
 ): string | undefined {
+  if (isClearAllStepsRequest(request)) {
+    return undefined
+  }
   const removeId = inferRemoveStepId(request, stepIds)
   if (!removeId || /\b(?:add|insert)\b/i.test(request)) {
     return undefined
@@ -137,6 +141,50 @@ function recoverDeleteStepPatch(
     /UPDATE WORKFLOW/i.test(raw) ||
     !hasValidPatchHeader(raw, workflowId) ||
     hasDeleteOp
+  ) {
+    return minimal
+  }
+  return undefined
+}
+
+function recoverClearAllStepsPatch(
+  request: string,
+  raw: string,
+  workflowId: string,
+  stepIds: readonly string[],
+  capabilityIds: readonly string[]
+): string | undefined {
+  if (!isClearAllStepsRequest(request) || stepIds.length === 0) {
+    return undefined
+  }
+
+  const deleteLines = stepIds.map((id) => `DELETE STEP ${id}`)
+  let minimal = `PATCH WORKFLOW ${workflowId}\n${deleteLines.join("\n")}`
+
+  if (isClearAndRebuildRequest(request) && capabilityIds.length > 0) {
+    const cap = capabilityIds[0]!
+    const stepId = capabilityStepId(cap)
+    minimal += `\nADD STEP ${stepId} USES ${cap}\n  LABEL "Generate"\n  WITH prompt = "Write a haiku."\n  AS ${stepId}`
+  }
+
+  const requiredDeletes = stepIds.every((id) =>
+    new RegExp(`DELETE STEP\\s+${escapeRegExp(id)}\\b`, "i").test(raw)
+  )
+  if (requiredDeletes && !isClearAndRebuildRequest(request)) {
+    return undefined
+  }
+  if (
+    requiredDeletes &&
+    isClearAndRebuildRequest(request) &&
+    capabilityIds.length > 0 &&
+    new RegExp(`ADD STEP\\s+${escapeRegExp(capabilityStepId(capabilityIds[0]!))}\\b`, "i").test(raw)
+  ) {
+    return undefined
+  }
+  if (
+    isGarbledPatchEqlOutput(raw) ||
+    !requiredDeletes ||
+    (isClearAndRebuildRequest(request) && capabilityIds.length > 0 && !/ADD STEP/i.test(raw))
   ) {
     return minimal
   }
@@ -284,6 +332,13 @@ export function recoverStructuredPatchFromRequest(
   const capabilityIds = context.capabilityIds ?? parseCapabilityIdsFromRequest(context.request)
 
   return (
+    recoverClearAllStepsPatch(
+      context.request,
+      raw,
+      context.workflowId,
+      context.stepIds,
+      capabilityIds
+    ) ??
     recoverCombinedDeleteAddPatch(
       context.request,
       raw,

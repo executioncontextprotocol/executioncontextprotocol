@@ -1,4 +1,9 @@
-import { collectModelOutputFeedback, jsonSchemaObjectProperties } from "@executioncontrolprotocol/core"
+import {
+  collectModelOutputFeedback,
+  jsonSchemaObjectProperties,
+  isClearAllStepsRequest,
+  isClearAndRebuildRequest,
+} from "@executioncontrolprotocol/core"
 import type { HarnessOperationFeedback, WorkflowManifest } from "@executioncontrolprotocol/types"
 import type { CompactEnvironmentSummary } from "@executioncontrolprotocol/core"
 
@@ -280,14 +285,40 @@ export function buildPatchOperationHintLines(
     `PATCH WORKFLOW must use id "${workflowId}".`,
     `Existing step ids: ${stepIds.join(", ") || "none"}.`,
     "Operation selection:",
-    "- remove/delete in the request → DELETE STEP for that step id only.",
+    "- remove/delete one named step → DELETE STEP for that step id only.",
+    "- remove all / clear / start fresh → DELETE STEP once for every existing step id.",
+    "- start fresh with new steps → DELETE every existing step id, then ADD STEP (no AFTER when empty).",
     "- change workflow label → UPDATE WORKFLOW with LABEL (not UPDATE STEP).",
     "- change a step label or input on a listed step id → UPDATE STEP for that id only.",
     "- add/insert a capability not yet in the workflow → ADD STEP with a new step id.",
     "- move/reorder an existing step → MOVE STEP with AFTER or BEFORE anchor.",
     "- multiple changes requested → include every required DELETE / UPDATE / ADD / MOVE line.",
+    "- CLEAR ACCEPTS / CLEAR RETURNS clear I/O only — they do not remove steps.",
   ]
-  if (moveMatch) {
+  if (isClearAllStepsRequest(request)) {
+    lines.push(
+      `This request clears all steps. Required: ${
+        stepIds.length > 0
+          ? stepIds.map((id) => `DELETE STEP ${id}`).join("; ")
+          : "no DELETE (workflow already has no steps)"
+      }.`
+    )
+    if (isClearAndRebuildRequest(request)) {
+      const required =
+        capabilityIds !== undefined
+          ? inferRequiredCapabilityIds(request, capabilityIds)
+          : []
+      const addCap = required[0]
+      if (addCap) {
+        const addStepId = addCap.split(".").pop() ?? "step"
+        lines.push(
+          `Then ADD STEP ${addStepId} USES ${addCap} (omit AFTER/BEFORE — workflow will be empty after deletes).`
+        )
+      } else {
+        lines.push("Then ADD STEP for each requested new capability (omit AFTER/BEFORE when empty).")
+      }
+    }
+  } else if (moveMatch) {
     const stepId = moveMatch[1]!
     const relation = moveMatch[2]!.toUpperCase()
     const anchorId = moveMatch[3]!
@@ -514,8 +545,26 @@ export function collectPatchGoalFeedback(
   const moveMatch = request.match(
     /\bmove\s+(?:the\s+)?(\w+)\s+(?:step\s+)?(?:to\s+run\s+)?(after|before)\s+(\w+)/i
   )
+  const clearAll = isClearAllStepsRequest(request)
 
-  if (removeMatch) {
+  if (clearAll) {
+    const remaining =
+      patched.steps?.filter((s) => "uses" in s && typeof s.uses === "string").map((s) => s.id) ?? []
+    if (remaining.length > 0 && !isClearAndRebuildRequest(request)) {
+      feedback.push(
+        collectModelOutputFeedback(
+          `Request clears all steps but these remain: ${remaining.join(", ")}. Emit DELETE STEP for every existing step id (${baselineStepIds.join(", ") || "none"}).`
+        )
+      )
+    }
+    if (isClearAndRebuildRequest(request) && remaining.length > 1) {
+      feedback.push(
+        collectModelOutputFeedback(
+          `Start-fresh rebuild should DELETE every baseline step id (${baselineStepIds.join(", ")}), then ADD only the new steps.`
+        )
+      )
+    }
+  } else if (removeMatch) {
     const stepId = removeMatch[1]!
     const still = patched.steps?.find((s) => s.id === stepId)
     if (still) {
@@ -786,6 +835,50 @@ export function collectPatchGoalFeedback(
     }
   }
 
+  const typeFeedback = collectGenerateReturnsTypeFeedback(patched, "eql")
+  if (typeFeedback) feedback.push(...typeFeedback)
+
+  return feedback.length > 0 ? feedback : undefined
+}
+
+function isGenerateCapabilityId(capabilityId: string): boolean {
+  return capabilityId.endsWith(".generate")
+}
+
+/**
+ * Flag RETURNS properties typed as string when they map to a *.generate .as key.
+ * Generate capabilities store `{ text }` objects, not bare strings.
+ * @internal
+ */
+export function collectGenerateReturnsTypeFeedback(
+  manifest: WorkflowManifest,
+  dialect: "eql" | "fluent" = "eql"
+): HarnessOperationFeedback[] | undefined {
+  const returnsFields = jsonSchemaObjectProperties(
+    manifest.workflow?.returns as Record<string, unknown> | undefined
+  )
+  if (returnsFields.length === 0) return undefined
+
+  const asToUses = new Map<string, string>()
+  for (const node of manifest.steps ?? []) {
+    if (!("uses" in node) || typeof node.uses !== "string") continue
+    if (!("as" in node) || typeof (node as { as?: unknown }).as !== "string") continue
+    const asKey = (node as { as: string }).as
+    if (!asKey) continue
+    asToUses.set(asKey, node.uses)
+  }
+
+  const feedback: HarnessOperationFeedback[] = []
+  for (const field of returnsFields) {
+    const uses = asToUses.get(field.name)
+    if (!uses || !isGenerateCapabilityId(uses)) continue
+    if (field.schema.type !== "string") continue
+    const message =
+      dialect === "fluent"
+        ? `.returns property "${field.name}" must be type "object" because .as("${field.name}") stores *.generate output { text }, not a bare string.`
+        : `RETURNS OUT ${field.name} must be object! because AS ${field.name} stores *.generate output { text }. Use OUT ${field.name}:object!, not string.`
+    feedback.push(collectModelOutputFeedback(message))
+  }
   return feedback.length > 0 ? feedback : undefined
 }
 
@@ -797,11 +890,12 @@ export function collectCreateWorkflowIoFeedback(
   request: string,
   manifest: WorkflowManifest
 ): HarnessOperationFeedback[] | undefined {
+  const typeFeedback = collectGenerateReturnsTypeFeedback(manifest, "eql") ?? []
   const lower = request.toLowerCase()
   if (!/\baccepts?\b|\breturns?\b|\brun\s+input\b/i.test(lower)) {
-    return undefined
+    return typeFeedback.length > 0 ? typeFeedback : undefined
   }
-  const feedback: HarnessOperationFeedback[] = []
+  const feedback: HarnessOperationFeedback[] = [...typeFeedback]
   const acceptsProp = inferAcceptsPropertyFromRequest(request)
   const returnsProp = inferReturnsPropertyFromRequest(request)
   const acceptsNames = workflowIoNames(manifest, "accepts")

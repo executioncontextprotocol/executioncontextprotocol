@@ -43,4 +43,8 @@ export interface RunResult {
   output?: Record<string, unknown>
   history?: Record<string, StepRunRecord>
   usage?: Record<string, unknown>
+  /**
+   * Run-level diagnostics (e.g. `workflow.returns` validation after steps completed).
+   */
+  diagnostics?: ValidationIssue[]
 }

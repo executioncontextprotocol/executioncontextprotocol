@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest"
 import type { WorkflowManifest } from "@executioncontrolprotocol/types"
 import {
   buildFluentPatchHintLines,
+  collectCreateWorkflowIoFeedback,
   collectFluentCompileErrorFeedback,
   collectFluentPatchGoalFeedback,
 } from "../src/fluent-patch-hints.js"
@@ -20,39 +21,49 @@ function loadWorkflow(name: string): WorkflowManifest {
 }
 
 describe("buildFluentPatchHintLines", () => {
-  it("wf-patch-01 mentions echo step id and Fluent label edit", () => {
-    const wf = loadWorkflow("echo-workflow.json")
+  it("wf-patch-01 mentions poem step id and Fluent label edit", () => {
+    const wf = loadWorkflow("two-step-generate-chain.json")
     const lines = buildFluentPatchHintLines(
-      "Change the echo step label to Patched Echo.",
+      "Change the poem step label to Draft Poem.",
       wf
     )
     const text = lines.join("\n")
-    expect(text).toContain('Target step id "echo"')
+    expect(text).toContain('Target step id "poem"')
     expect(text).toContain('Preserve every existing step .id')
   })
 
-  it("wf-patch-03 steers append step and ref after echo", () => {
-    const wf = loadWorkflow("echo-workflow.json")
-    const caps = ["@executioncontrolprotocol/test.echo", "@executioncontrolprotocol/test.summarize"]
+  it("wf-patch-03 steers append step and ref after summarize", () => {
+    const wf = loadWorkflow("two-step-generate-chain.json")
+    const caps = ["@executioncontrolprotocol/ollama.generate"]
     const lines = buildFluentPatchHintLines(
-      "Add a summarize step after echo using @executioncontrolprotocol/test.summarize.",
+      "Add a critique step after summarize using @executioncontrolprotocol/ollama.generate.",
       wf,
       caps
     )
     const text = lines.join("\n")
     expect(text).toMatch(/ref\(|append/i)
-    expect(text).toContain("@executioncontrolprotocol/test.summarize")
+    expect(text).toContain("@executioncontrolprotocol/ollama.generate")
   })
 
   it("wf-patch-12 steers reorder in run array not moveStep", () => {
-    const wf = loadWorkflow("echo-validate-reorder.json")
+    const wf = loadWorkflow("two-step-generate-chain.json")
     const lines = buildFluentPatchHintLines(
-      "Move the echo step to run after validate.",
+      "Move the summarize step to run after poem.",
       wf
     )
     const text = lines.join("\n")
     expect(text).toContain("Reorder .run([...])")
-    expect(text).toContain("validate, echo")
+    expect(text).toContain("poem, summarize")
+  })
+
+  it("wf-patch-13 steers .run([]) for remove-all", () => {
+    const wf = loadWorkflow("haiku-explain-workflow.json")
+    const lines = buildFluentPatchHintLines("Remove all steps from the workflow.", wf)
+    const text = lines.join("\n")
+    expect(text).toContain(".run([])")
+    expect(text).toContain("haiku")
+    expect(text).toContain("explain")
+    expect(text).not.toContain("Preserve every existing step")
   })
 })
 
@@ -78,30 +89,140 @@ describe("collectFluentCompileErrorFeedback", () => {
 })
 
 describe("collectFluentPatchGoalFeedback", () => {
-  it("flags missing echo step id after label patch", () => {
-    const baseline = loadWorkflow("echo-workflow.json")
+  it("flags missing poem step id after label patch", () => {
+    const baseline = loadWorkflow("two-step-generate-chain.json")
+    const poem = baseline.steps?.[0]
     const patched: WorkflowManifest = {
       ...baseline,
       steps: [
         {
           type: "step",
-          id: "patched-echo",
-          label: "Patched Echo",
-          uses: "@executioncontrolprotocol/test.echo",
-          input: { value: "hello from fluent API" },
-          as: "echo",
+          id: "patched-poem",
+          label: "Draft Poem",
+          uses: poem && "uses" in poem ? poem.uses : "@executioncontrolprotocol/ollama.generate",
+          input: poem && "input" in poem ? poem.input : { prompt: "Write a short poem about the ocean." },
+          as: "poem",
         },
+        ...(baseline.steps?.slice(1) ?? []),
       ],
     }
     const feedback = collectFluentPatchGoalFeedback(
-      "Change the echo step label to Patched Echo.",
+      "Change the poem step label to Draft Poem.",
       patched,
       { capabilities: [], extensions: [] } as import("@executioncontrolprotocol/core").CompactEnvironmentSummary,
       baseline
     )
     expect(feedback?.length).toBeGreaterThan(0)
     expect(
-      feedback!.some((f) => f.issues.some((i) => i.message.includes("echo")))
+      feedback!.some((f) => f.issues.some((i) => i.message.includes("poem")))
     ).toBe(true)
+  })
+
+  it("flags remaining steps after remove-all", () => {
+    const baseline = loadWorkflow("haiku-explain-workflow.json")
+    const feedback = collectFluentPatchGoalFeedback(
+      "Remove all steps from the workflow.",
+      baseline,
+      { capabilities: [], extensions: [] } as import("@executioncontrolprotocol/core").CompactEnvironmentSummary,
+      baseline
+    )
+    const text = (feedback ?? []).flatMap((f) => f.issues.map((i) => i.message)).join("\n")
+    expect(text).toMatch(/clears all steps/i)
+    expect(text).toContain(".run([])")
+  })
+
+  it("flags string returns on chrome-ai.generate .as key", () => {
+    const patched: WorkflowManifest = {
+      schema: "@executioncontrolprotocol.workflow",
+      version: "1.0.0",
+      workflow: {
+        id: "skip-generate",
+        label: "Skip Generate",
+        returns: {
+          type: "object",
+          properties: { response: { type: "string" } },
+          required: ["response"],
+        },
+      },
+      steps: [
+        {
+          type: "step",
+          id: "generate",
+          uses: "@executioncontrolprotocol/chrome-ai.generate",
+          label: "Generate",
+          as: "response",
+        },
+      ],
+    }
+    const feedback = collectFluentPatchGoalFeedback(
+      "Fix the returns schema.",
+      patched,
+      { capabilities: [], extensions: [] } as import("@executioncontrolprotocol/core").CompactEnvironmentSummary
+    )
+    expect(
+      feedback!.some((f) => f.issues.some((i) => /type "object"/.test(i.message)))
+    ).toBe(true)
+  })
+})
+
+describe("collectCreateWorkflowIoFeedback generate returns", () => {
+  it("flags string returns for generate without I/O keywords in the request", () => {
+    const wf: WorkflowManifest = {
+      schema: "@executioncontrolprotocol.workflow",
+      version: "1.0.0",
+      workflow: {
+        id: "skip-generate",
+        label: "Skip Generate",
+        returns: {
+          type: "object",
+          properties: { response: { type: "string" } },
+          required: ["response"],
+        },
+      },
+      steps: [
+        {
+          type: "step",
+          id: "generate",
+          uses: "@executioncontrolprotocol/chrome-ai.generate",
+          label: "Generate",
+          as: "response",
+        },
+      ],
+    }
+    const feedback = collectCreateWorkflowIoFeedback("Create a chrome generate workflow", wf)
+    expect(
+      feedback!.some((f) => f.issues.some((i) => /type "object"/.test(i.message)))
+    ).toBe(true)
+  })
+
+  it("does not flag object returns for generate", () => {
+    const wf: WorkflowManifest = {
+      schema: "@executioncontrolprotocol.workflow",
+      version: "1.0.0",
+      workflow: {
+        id: "ok",
+        label: "Ok",
+        returns: {
+          type: "object",
+          properties: {
+            response: {
+              type: "object",
+              properties: { text: { type: "string" } },
+            },
+          },
+          required: ["response"],
+        },
+      },
+      steps: [
+        {
+          type: "step",
+          id: "generate",
+          uses: "@executioncontrolprotocol/chrome-ai.generate",
+          label: "Generate",
+          as: "response",
+        },
+      ],
+    }
+    expect(collectCreateWorkflowIoFeedback("Create chrome generate", wf)).toBeUndefined()
   })
 })

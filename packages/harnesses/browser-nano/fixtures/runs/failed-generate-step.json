@@ -1,0 +1,29 @@
+{
+  "run": {
+    "schema": "@executioncontrolprotocol.run.result",
+    "version": "1.0",
+    "run": { "id": "run-failed-generate", "status": "failed" },
+    "history": {
+      "poem": {
+        "status": "failed",
+        "output": { "error": "Generate step rejected input: prompt must be non-empty" },
+        "attempts": 1
+      }
+    }
+  },
+  "workflow": {
+    "schema": "@executioncontrolprotocol.workflow",
+    "version": "1.0",
+    "workflow": { "id": "poem-test", "label": "Poem test" },
+    "steps": [
+      {
+        "type": "step",
+        "id": "poem",
+        "label": "Generate Poem",
+        "uses": "@executioncontrolprotocol/chrome-ai.generate",
+        "input": { "prompt": "" },
+        "as": "poem"
+      }
+    ]
+  }
+}

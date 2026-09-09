@@ -1,0 +1,33 @@
+{
+  "schema": "@executioncontrolprotocol.workflow",
+  "version": "1.0",
+  "workflow": {
+    "id": "poem-summarize",
+    "label": "Poem Summarization"
+  },
+  "steps": [
+    {
+      "type": "step",
+      "id": "poem",
+      "label": "Generate Poem",
+      "uses": "@executioncontrolprotocol/chrome-ai.generate",
+      "input": {
+        "prompt": "Write a short poem about the ocean."
+      },
+      "as": "poem"
+    },
+    {
+      "type": "step",
+      "id": "summarize",
+      "label": "Summarize Poem",
+      "uses": "@executioncontrolprotocol/chrome-ai.generate",
+      "input": {
+        "prompt": "Summarize the following poem:",
+        "context": {
+          "$ref": "state.poem.text"
+        }
+      },
+      "as": "summary"
+    }
+  ]
+}

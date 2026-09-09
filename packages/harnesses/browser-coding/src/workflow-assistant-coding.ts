@@ -118,6 +118,15 @@ const harnessInputSchema = z.object({
   model: z.string().optional(),
   runContext: harnessRunContextSchema.optional(),
   workflow: z.record(z.string(), z.unknown()).optional(),
+  classifiedIntent: z
+    .object({
+      schema: z.literal("@executioncontrolprotocol.intent"),
+      intent: z.string(),
+      topic: z.string().optional(),
+      summary: z.string().optional(),
+    })
+    .optional(),
+  conversationSummary: z.string().optional(),
 })
 
 function formatReplyAsTypeScript(reply: HarnessReply): string {
@@ -125,11 +134,14 @@ function formatReplyAsTypeScript(reply: HarnessReply): string {
   const citations =
     reply.citations?.length &&
     `,\n  citations: ${JSON.stringify(reply.citations, null, 2).replace(/\n/g, "\n  ")}`
+  const suggestedAction = reply.suggestedAction
+    ? `,\n  suggestedAction: "${reply.suggestedAction}"`
+    : ""
   return `import type { HarnessReply } from "@executioncontrolprotocol/types"
 
 export const reply: HarnessReply = {
   schema: "@executioncontrolprotocol.harness.reply",
-  answer: "${answer}"${citations ?? ""},
+  answer: "${answer}"${citations ?? ""}${suggestedAction},
 }`
 }
 
@@ -385,7 +397,14 @@ function decodedValidationStub(valid = true): ValidationResult {
 
 /** Workflow assistant for Browser Coding harness. @category Harness */
 export async function invokeWorkflowAssistantCoding(
-  input: { message: string; runContext?: unknown; model?: string },
+  input: {
+    message: string
+    runContext?: unknown
+    model?: string
+    workflow?: Record<string, unknown>
+    classifiedIntent?: { schema: string; intent: string; topic?: string; summary?: string }
+    conversationSummary?: string
+  },
   ctx: HarnessCapabilityContext<Record<string, unknown>>
 ): Promise<HarnessEvaluateOutput> {
   return codingAssistantHarness.handler(input, ctx) as Promise<HarnessEvaluateOutput>

@@ -19,5 +19,8 @@ export function encodeReplyToEql(
     const detailPart = c.detail ? ` ${formatLiteral(c.detail, writer.quote)}` : ""
     writer.writeln(`CITATION ${c.kind}${idPart}${detailPart}`, 1)
   }
+  if (reply.suggestedAction) {
+    writer.writeln(`ACTION ${reply.suggestedAction}`, 1)
+  }
   return writer.toString()
 }

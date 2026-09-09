@@ -70,6 +70,27 @@ describe("tryBuildFaqReply", () => {
   })
 })
 
+describe("tryBuildChangeSummaryReply", () => {
+  it("always sets offer-run", async () => {
+    const { tryBuildChangeSummaryReply } = await import("../../src/harness/authoring/safe-reply.js")
+    const authored = {
+      schema: "@executioncontrolprotocol.workflow" as const,
+      version: "1.0",
+      workflow: { id: "w", label: "W" },
+      steps: [
+        {
+          type: "step" as const,
+          id: "echo",
+          uses: "@executioncontrolprotocol/test.echo",
+          as: "echo",
+        },
+      ],
+    }
+    const reply = tryBuildChangeSummaryReply(undefined, authored)
+    expect(reply.suggestedAction).toBe("offer-run")
+  })
+})
+
 describe("tryBuildEnvironmentReply", () => {
   it("lists ECP extensions and step capabilities", async () => {
     const { tryBuildEnvironmentReply } = await import("../../src/harness/authoring/safe-reply.js")

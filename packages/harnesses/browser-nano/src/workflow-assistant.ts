@@ -101,6 +101,9 @@ function formatReplyAsEql(reply: HarnessReply): string {
     const detailPart = c.detail ? ` "${c.detail.replace(/"/g, '\\"')}"` : ""
     lines.push(`  CITATION ${c.kind}${idPart}${detailPart}`)
   }
+  if (reply.suggestedAction) {
+    lines.push(`  ACTION ${reply.suggestedAction}`)
+  }
   return lines.join("\n")
 }
 
@@ -162,7 +165,7 @@ export const evalsWorkflowAssistantHarness = defineHarness("@executioncontrolpro
         !/^what can you do\??$/i.test(input.message.trim())
       if (capabilitiesQuestion) {
         lines.push(
-          "Required reply: mention ECP and list step capability ids from the environment summary (must include @executioncontrolprotocol/test.echo)."
+          "Required reply: mention ECP and list step capability ids from the environment summary (must include @executioncontrolprotocol/chrome-ai.generate or a *.generate capability)."
         )
       }
       lines.push(...contextBundle.lines)

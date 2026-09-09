@@ -147,10 +147,11 @@ export type { HarnessRunContext } from "./harness-run-context.js"
 export {
   ECP_HARNESS_REPLY_SCHEMA,
   ECP_HARNESS_REPLY_CITATION_KINDS,
+  ECP_HARNESS_REPLY_ACTIONS,
   harnessReplySchema,
   harnessReplyCitationSchema,
 } from "./harness-reply.js"
-export type { HarnessReply } from "./harness-reply.js"
+export type { HarnessReply, EcpHarnessReplyAction } from "./harness-reply.js"
 export {
   HARNESS_TASK_IDS,
   harnessChatInputSchema,

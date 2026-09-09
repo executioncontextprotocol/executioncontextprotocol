@@ -1,0 +1,33 @@
+{
+  "schema": "@executioncontrolprotocol.workflow",
+  "version": "1.0",
+  "workflow": {
+    "id": "generate-accepts",
+    "label": "Generate accepts",
+    "accepts": {
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "prompt"
+      ]
+    }
+  },
+  "steps": [
+    {
+      "type": "step",
+      "id": "generate",
+      "label": "Generate",
+      "uses": "@executioncontrolprotocol/ollama.generate",
+      "input": {
+        "prompt": {
+          "$ref": "state.prompt"
+        }
+      },
+      "as": "response"
+    }
+  ]
+}

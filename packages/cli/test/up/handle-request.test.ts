@@ -170,6 +170,45 @@ describe("createUpRequestHandler", () => {
     expect(get).toHaveBeenCalledWith("ecp://artifacts/images/x.png")
   })
 
+  it("rejects /v1/describe without token", async () => {
+    const handler = createUpRequestHandler({
+      ecp: ecp as never,
+      allowOrigins: new Set(),
+      token: "secret",
+      ollamaUrl: "http://127.0.0.1:11434",
+    })
+    const out = createRes()
+    await handler(createReq("GET", "/v1/describe", {}), out.res)
+    expect(out.statusCode).toBe(401)
+  })
+
+  it("returns host describe with a valid token", async () => {
+    const describe = vi.fn().mockResolvedValue({
+      schema: "@executioncontrolprotocol.environment.describe",
+      version: "1.0.0",
+      environment: { id: "ecp-up" },
+      capabilities: [{ id: "@executioncontrolprotocol/ollama.generate", execution: "host" }],
+    })
+    const ecpDescribe = { invoke: vi.fn(), describe }
+    const handler = createUpRequestHandler({
+      ecp: ecpDescribe as never,
+      allowOrigins: new Set(),
+      token: "secret",
+      ollamaUrl: "http://127.0.0.1:11434",
+    })
+    const out = createRes()
+    await handler(
+      createReq("GET", "/v1/describe", { authorization: "Bearer secret" }),
+      out.res
+    )
+    expect(out.statusCode).toBe(200)
+    expect(JSON.parse(out.body)).toMatchObject({
+      environment: { id: "ecp-up" },
+      capabilities: [{ id: "@executioncontrolprotocol/ollama.generate" }],
+    })
+    expect(describe).toHaveBeenCalled()
+  })
+
   it("invokes a capability with a valid token", async () => {
     const process = vi.fn().mockResolvedValue({
       success: true,

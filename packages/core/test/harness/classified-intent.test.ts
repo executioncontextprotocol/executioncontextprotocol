@@ -24,6 +24,9 @@ describe("inferIntentFromMessageHeuristic", () => {
     expect(
       inferIntentFromMessageHeuristic("The workflow failed on echo, help me fix it.")
     ).toBe("workflow-patch")
+    expect(inferIntentFromMessageHeuristic("Remove all steps and start fresh.")).toBe(
+      "workflow-patch"
+    )
     expect(inferIntentFromMessageHeuristic("I need a new workflow with echo.")).toBe(
       "workflow-create"
     )

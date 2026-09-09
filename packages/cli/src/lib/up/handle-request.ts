@@ -76,6 +76,16 @@ export function createUpRequestHandler(options: UpRequestHandlerOptions) {
       return
     }
 
+    if (req.method === "GET" && pathname === "/v1/describe") {
+      if (!authorizeUpRequest(req, url, token)) {
+        writeJson(res, 401, { error: "Unauthorized" })
+        return
+      }
+      const descriptor = await ecp.describe()
+      writeJson(res, 200, descriptor)
+      return
+    }
+
     if (req.method === "POST" && pathname === "/v1/invoke") {
       if (!authorizeUpRequest(req, url, token)) {
         writeJson(res, 401, { error: "Unauthorized" })

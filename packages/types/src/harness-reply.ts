@@ -11,6 +11,15 @@ export const ECP_HARNESS_REPLY_CITATION_KINDS = {
   ERROR: "error",
 } as const
 
+/** Suggested UI action attached to a harness reply. @category Harness */
+export const ECP_HARNESS_REPLY_ACTIONS = {
+  OFFER_RUN: "offer-run",
+} as const
+
+/** Suggested action literal union. @category Harness */
+export type EcpHarnessReplyAction =
+  (typeof ECP_HARNESS_REPLY_ACTIONS)[keyof typeof ECP_HARNESS_REPLY_ACTIONS]
+
 /** Harness reply citation. @category Harness */
 export const harnessReplyCitationSchema = z.object({
   kind: z.enum([
@@ -30,6 +39,8 @@ export const harnessReplySchema = z.object({
   answer: z.string(),
   /** Optional structured citations. */
   citations: z.array(harnessReplyCitationSchema).optional(),
+  /** Optional suggested follow-up action for the host UI. */
+  suggestedAction: z.enum([ECP_HARNESS_REPLY_ACTIONS.OFFER_RUN]).optional(),
 })
 
 /** Structured harness assistant reply type. @category Harness */
