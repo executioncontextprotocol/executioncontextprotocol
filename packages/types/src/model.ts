@@ -1,5 +1,6 @@
 import { z } from "zod"
 import type { GenerateCapabilityInput, GenerateCapabilityOutput } from "./capabilities.js"
+import { fileRefSchema } from "./file-ref.js"
 
 /** Interface tag for harness-compatible model providers. @category Harness */
 export const ECP_MODEL_GENERATE_INTERFACE = "@executioncontrolprotocol/model.generate" as const
@@ -32,6 +33,11 @@ export const modelGenerateInputSchema = z.object({
   responseFormat: z.enum(["text", "json", "toon", "eql"]).optional(),
   /** Provider-specific options (e.g. temperature, top_p for Ollama). */
   options: z.record(z.string(), z.unknown()).optional(),
+  /**
+   * Optional portable file refs for multimodal providers.
+   * Providers that do not support files must reject a non-empty list.
+   */
+  files: z.array(fileRefSchema()).optional(),
 })
 
 /** Normalized model generate input type. @category Harness */

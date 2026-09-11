@@ -1,7 +1,7 @@
 {
-  "name": "@executioncontrolprotocol/claude",
+  "name": "@executioncontrolprotocol/anthropic",
   "version": "0.13.2",
-  "description": "Anthropic Claude provider for ECP",
+  "description": "Anthropic Claude model provider for ECP",
   "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.js",

@@ -46,7 +46,7 @@ export const BUNDLED_EXTENSION_IDS = [
  *
  * Intentionally excluded from this bundle:
  * - `@executioncontrolprotocol/chrome-ai` — browser-only (Chrome on-device `LanguageModel` API).
- * - `@executioncontrolprotocol/claude` — requires the Anthropic provider configuration/credentials.
+ * - `@executioncontrolprotocol/anthropic` — requires the Anthropic provider configuration/credentials.
  * - Vendor packages (`fal`, `slack`, `image-sharp`, `adobe`) — published from the extensions repo.
  *
  * @category Extensions

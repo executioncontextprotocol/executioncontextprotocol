@@ -10,6 +10,10 @@ export {
   type OllamaQwenCoderEvalProfile,
 } from "./profiles/ollama-qwen.js"
 export { CHROME_NANO_EVAL } from "./profiles/chrome-nano.js"
+export {
+  ANTHROPIC_CLAUDE_SONNET_45_EVAL,
+  type AnthropicClaudeSonnetEvalProfile,
+} from "./profiles/anthropic-sonnet.js"
 export type { EvalProviderProfile } from "./profiles/eval-provider.js"
 export {
   getActiveEvalProvider,
@@ -53,6 +57,10 @@ export {
   type OllamaEvalReadiness,
 } from "./helpers/ollama.js"
 export { ollamaQwenEvalReady } from "./helpers/ollama-qwen.js"
+export {
+  anthropicEvalReady,
+  type AnthropicEvalReadiness,
+} from "./helpers/anthropic.js"
 export {
   chromeNanoEvalReady,
   type ChromeNanoEvalReadiness,

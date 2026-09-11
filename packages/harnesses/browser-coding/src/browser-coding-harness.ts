@@ -46,6 +46,7 @@ const harnessInputSchema = z.discriminatedUnion("task", [
     probeContext: z.unknown().optional(),
     conversationSummary: z.string().optional(),
     model: z.string().optional(),
+    files: z.array(z.unknown()).optional(),
   }),
 ])
 
@@ -113,6 +114,7 @@ const browserCodingHarnessDefinition = defineHarness("@executioncontrolprotocol"
             probeContext: input.probeContext,
             conversationSummary: input.conversationSummary,
             model: input.model,
+            files: input.files,
           },
           taskCtx
         )

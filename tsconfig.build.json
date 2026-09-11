@@ -22,7 +22,7 @@
     { "path": "packages/extensions/browser-secrets" },
     { "path": "packages/extensions/process-env" },
     { "path": "packages/extensions/chrome-ai" },
-    { "path": "packages/extensions/claude" },
+    { "path": "packages/extensions/anthropic" },
     { "path": "packages/extensions/index" },
     { "path": "packages/runtimes/temporal" },
     { "path": "packages/cli" },

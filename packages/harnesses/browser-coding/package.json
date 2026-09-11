@@ -37,6 +37,7 @@
     "@executioncontrolprotocol/core": "workspace:^",
     "@executioncontrolprotocol/evals": "workspace:^",
     "@executioncontrolprotocol/extension-ollama": "workspace:^",
+    "@executioncontrolprotocol/anthropic": "workspace:^",
     "@executioncontrolprotocol/format-toon": "workspace:^",
     "@executioncontrolprotocol/node": "workspace:^",
     "@executioncontrolprotocol/types": "workspace:^",

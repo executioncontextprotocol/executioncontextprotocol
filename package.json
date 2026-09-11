@@ -27,6 +27,7 @@
     "test:eval:smoke": "vitest run --project eval packages/harnesses/browser-nano/test/eval/matrix-chat.eval.test.ts packages/harnesses/browser-nano/test/eval/eval-matrix-count.test.ts packages/evals/test/fixtures/load-eval-cases.test.ts",
     "test:eval:matrix": "vitest run --project eval packages/harnesses/browser-nano/test/eval packages/harnesses/browser-coding/test/eval packages/evals/test/fixtures/load-eval-cases.test.ts",
     "test:eval:matrix:coding": "vitest run --project eval packages/harnesses/browser-coding/test/eval",
+    "test:eval:matrix:coding:anthropic": "vitest run --project eval packages/harnesses/browser-coding/test/eval/matrix-intent.anthropic.eval.test.ts packages/harnesses/browser-coding/test/eval/matrix-assistant.anthropic.eval.test.ts packages/harnesses/browser-coding/test/eval/matrix-chat.anthropic.eval.test.ts packages/harnesses/browser-coding/test/eval/matrix-workflow-create.anthropic.eval.test.ts packages/harnesses/browser-coding/test/eval/matrix-workflow-patch.anthropic.eval.test.ts",
     "eval:matrix:chrome": "vitest run --project eval-browser",
     "eval:matrix:chrome:smoke": "vitest run --project eval-browser packages/harnesses/browser-nano/test/eval/browser/matrix-workflow-patch.eval.test.ts packages/harnesses/browser-nano/test/eval/browser/matrix-intent.eval.test.ts packages/harnesses/browser-nano/test/eval/browser/matrix-descriptor-order.eval.test.ts",
     "test:browser:install": "playwright install chromium --with-deps",

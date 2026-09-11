@@ -302,6 +302,11 @@ export const ollamaExtension = defineExtension("@executioncontrolprotocol", "oll
       .withOutput(modelGenerateOutputSchema)
       .withHandler(async (input, ctx) => {
         const parsed = input as z.infer<typeof GenerateInput>
+        if (parsed.files && parsed.files.length > 0) {
+          throw new Error(
+            "@executioncontrolprotocol/ollama.generate does not support files yet"
+          )
+        }
         const cfg = (ctx as { extensionConfig?: Record<string, unknown> }).extensionConfig ?? {}
         const baseURL =
           (cfg.baseURL as string | undefined) ??

@@ -13,10 +13,12 @@ import {
 } from "@executioncontrolprotocol/types"
 import { OLLAMA_GEMMA_1B_EVAL } from "../profiles/ollama-gemma.js"
 import { OLLAMA_QWEN_CODER_15B_EVAL } from "../profiles/ollama-qwen.js"
+import { ANTHROPIC_CLAUDE_SONNET_45_EVAL } from "../profiles/anthropic-sonnet.js"
 
 const JUDGE_ENABLED_PROFILE_IDS: Set<string> = new Set([
   OLLAMA_GEMMA_1B_EVAL.id,
   OLLAMA_QWEN_CODER_15B_EVAL.id,
+  ANTHROPIC_CLAUDE_SONNET_45_EVAL.id,
 ])
 import { getActiveEvalProvider } from "../profiles/eval-provider-context.js"
 import type { EvalProviderProfile } from "../profiles/eval-provider.js"
@@ -424,7 +426,7 @@ export async function assertDeterministic(
 }
 
 /**
- * Run LLM judge via @executioncontrolprotocol/ollama.evaluate when enabled.
+ * Run LLM judge via the active provider's `.evaluate` capability when enabled.
  * @category Evals
  */
 export async function assertJudge(
@@ -442,9 +444,10 @@ export async function assertJudge(
   const label = caseLabel(caseRow, stepIndex)
   let approved = false
   let judgeDetail = ""
+  const evaluateCapability = `${provider.providerId}.evaluate`
   try {
     const evalInvoke = await ecp
-      .invoke("@executioncontrolprotocol/ollama.evaluate")
+      .invoke(evaluateCapability)
       .with({
         artifact: harnessOutput.artifact,
         goal: judge.goal ?? `Eval case ${caseRow.id}`,

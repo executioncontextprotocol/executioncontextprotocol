@@ -29,6 +29,7 @@ import {
 } from "./fluent-patch-hints.js"
 import {
   ECP_MODEL_GENERATE_INTERFACE,
+  fileRefSchema,
   harnessEvaluateOutputSchema,
   type HarnessEvaluateOutput,
   type HarnessInvokeResult,
@@ -92,6 +93,7 @@ const harnessInputSchema = z.object({
   request: z.string(),
   manifest: z.unknown().optional(),
   model: z.string().optional(),
+  files: z.array(fileRefSchema()).optional(),
 })
 
 const codingWorkflowAuthoringHarness = defineHarness("@executioncontrolprotocol", "browser-coding-workflow-authoring")
@@ -193,7 +195,13 @@ const codingWorkflowAuthoringHarness = defineHarness("@executioncontrolprotocol"
         lastPrompt = buildPrompt(repairText)
         const generated = await callModelGenerate(
           ctx.uses,
-          { prompt: lastPrompt, system, model: input.model, responseFormat },
+          {
+            prompt: lastPrompt,
+            system,
+            model: input.model,
+            responseFormat,
+            files: input.files,
+          },
           ctx.capabilityContext,
           format
         )
@@ -313,11 +321,17 @@ export async function invokeWorkflowAuthoringCoding(
     manifest?: unknown
     model?: string
     probeContext?: unknown
+    files?: unknown[]
   },
   ctx: HarnessCapabilityContext<Record<string, unknown>>
 ): Promise<HarnessEvaluateOutput> {
   return codingWorkflowAuthoringHarness.handler(
-    { request: input.request, manifest: input.manifest, model: input.model },
+    {
+      request: input.request,
+      manifest: input.manifest,
+      model: input.model,
+      files: input.files as never,
+    },
     ctx
   ) as Promise<HarnessEvaluateOutput>
 }

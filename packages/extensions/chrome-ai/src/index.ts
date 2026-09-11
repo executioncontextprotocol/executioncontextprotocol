@@ -38,6 +38,9 @@ async function runChromePrompt(
   input: ModelGenerateInput,
   ctx: CapabilityContext
 ): Promise<{ text: string }> {
+  if (input.files && input.files.length > 0) {
+    throw new Error("@executioncontrolprotocol/chrome-ai.generate does not support files yet")
+  }
   await assertModelReady()
   const model = chromeAi()
   if (!model?.create) {

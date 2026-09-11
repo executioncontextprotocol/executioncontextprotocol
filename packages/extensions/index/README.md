@@ -30,7 +30,7 @@ The exact set is exported as `BUNDLED_EXTENSION_IDS`.
 | Extension | Why excluded |
 | --------- | ------------ |
 | `@executioncontrolprotocol/chrome-ai` | Browser-only (Chrome on-device `LanguageModel` API) |
-| `@executioncontrolprotocol/claude` | Requires Anthropic provider configuration/credentials |
+| `@executioncontrolprotocol/anthropic` | Requires Anthropic provider configuration/credentials |
 
 **Vendor extensions** are published from the sibling [extensions](https://github.com/executioncontrolprotocol/extensions) repo — see that repo’s [package list](https://github.com/executioncontrolprotocol/extensions#packages). Do not maintain a vendor inventory in this README.
 

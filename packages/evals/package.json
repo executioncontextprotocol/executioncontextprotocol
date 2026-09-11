@@ -23,6 +23,7 @@
     "@executioncontrolprotocol/harnesses-browser-nano": "workspace:^",
     "@executioncontrolprotocol/harnesses-browser-coding": "workspace:^",
     "@executioncontrolprotocol/extension-ollama": "workspace:^",
+    "@executioncontrolprotocol/anthropic": "workspace:^",
     "@executioncontrolprotocol/format-eql": "workspace:^",
     "@executioncontrolprotocol/format-toon": "workspace:^",
     "@executioncontrolprotocol/node": "workspace:^",

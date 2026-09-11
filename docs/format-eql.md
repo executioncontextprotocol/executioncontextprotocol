@@ -556,7 +556,7 @@ UPDATE STEP create_image
 PATCH WORKFLOW weekly_brief
 
 UPDATE STEP generate_brief
-  USES @executioncontrolprotocol/claude.generate
+  USES @executioncontrolprotocol/anthropic.generate
 ```
 
 ## Add a step

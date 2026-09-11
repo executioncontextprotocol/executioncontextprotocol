@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { fileRefSchema } from "./file-ref.js"
 import { harnessRunContextSchema } from "./harness-run-context.js"
 import { probeContextSchema } from "./probe-context.js"
 
@@ -47,6 +48,8 @@ export const harnessChatInputSchema = z.object({
   conversationSummary: z.string().optional(),
   /** Optional model override. */
   model: z.string().optional(),
+  /** Optional multimodal file refs forwarded to the provider generate shot. */
+  files: z.array(fileRefSchema()).optional(),
 })
 
 /** Multi-shot chat input type. @category Harness */

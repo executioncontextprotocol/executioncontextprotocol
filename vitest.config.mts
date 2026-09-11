@@ -80,7 +80,7 @@ export default defineConfig({
       "@executioncontrolprotocol/format-mermaid": path.resolve(repoRoot, "packages/extensions/format-mermaid/src/index.ts"),
       "@executioncontrolprotocol/format-eql": path.resolve(repoRoot, "packages/extensions/format-eql/src/index.ts"),
       "@executioncontrolprotocol/chrome-ai": path.resolve(repoRoot, "packages/extensions/chrome-ai/src/index.ts"),
-      "@executioncontrolprotocol/claude": path.resolve(repoRoot, "packages/extensions/claude/src/index.ts"),
+      "@executioncontrolprotocol/anthropic": path.resolve(repoRoot, "packages/extensions/anthropic/src/index.ts"),
       "@executioncontrolprotocol/extension-ollama": path.resolve(
         repoRoot,
         "packages/extensions/ollama/src/index.ts"

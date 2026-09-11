@@ -125,6 +125,7 @@ export async function invokeMultiShotChatCoding(
     probeContext?: unknown
     conversationSummary?: string
     model?: string
+    files?: unknown[]
   },
   ctx: HarnessCapabilityContext<Record<string, unknown>>
 ): Promise<HarnessEvaluateOutput> {
@@ -218,6 +219,7 @@ export async function invokeMultiShotChatCoding(
           manifest: isPatch ? input.manifest : undefined,
           model: input.model,
           probeContext: opts.probe,
+          files: input.files,
         },
         { ...ctx, config: buildTaskConfig(HARNESS_TASKS.WORKFLOW_AUTHORING) }
       )
@@ -448,6 +450,7 @@ export async function invokeMultiShotChatCoding(
         classifiedIntent,
         conversationSummary: input.conversationSummary,
         probeContext,
+        files: input.files,
       },
       { ...ctx, config: buildTaskConfig(HARNESS_TASKS.WORKFLOW_ASSISTANT) }
     )

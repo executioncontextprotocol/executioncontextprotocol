@@ -21,6 +21,7 @@ import {
 import {
   ECP_HARNESS_REPLY_SCHEMA,
   ECP_MODEL_GENERATE_INTERFACE,
+  fileRefSchema,
   harnessEvaluateOutputSchema,
   harnessRunContextSchema,
   LATEST_ECP_VERSION,
@@ -127,6 +128,7 @@ const harnessInputSchema = z.object({
     })
     .optional(),
   conversationSummary: z.string().optional(),
+  files: z.array(fileRefSchema()).optional(),
 })
 
 function formatReplyAsTypeScript(reply: HarnessReply): string {
@@ -221,6 +223,7 @@ const codingAssistantHarness = defineHarness("@executioncontrolprotocol", "brows
               system,
               model: input.model,
               responseFormat: inferResponseFormatFromFormatter(format),
+              files: input.files,
             },
             ctx.capabilityContext,
             format
@@ -405,6 +408,7 @@ export async function invokeWorkflowAssistantCoding(
     classifiedIntent?: { schema: string; intent: string; topic?: string; summary?: string }
     conversationSummary?: string
     probeContext?: unknown
+    files?: unknown[]
   },
   ctx: HarnessCapabilityContext<Record<string, unknown>>
 ): Promise<HarnessEvaluateOutput> {
@@ -416,6 +420,7 @@ export async function invokeWorkflowAssistantCoding(
       workflow: input.workflow,
       classifiedIntent: input.classifiedIntent,
       conversationSummary: input.conversationSummary,
+      files: input.files as never,
     },
     ctx
   ) as Promise<HarnessEvaluateOutput>

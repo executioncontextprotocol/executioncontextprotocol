@@ -48,6 +48,11 @@ export const openaiExtension = defineExtension("@executioncontrolprotocol", "ope
       .withOutput(modelGenerateOutputSchema)
       .withHandler(async (input, ctx) => {
         const parsed = modelGenerateInputSchema.parse(input)
+        if (parsed.files && parsed.files.length > 0) {
+          throw new Error(
+            "@executioncontrolprotocol/openai.generate does not support files yet"
+          )
+        }
         const cfg = (ctx as { extensionConfig?: Record<string, unknown> }).extensionConfig ?? {}
         const apiKey = resolveOpenaiApiKey(cfg)
         if (!apiKey) throw new Error("OpenAI API key required")

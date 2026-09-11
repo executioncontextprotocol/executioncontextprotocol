@@ -19,6 +19,6 @@ describe("@executioncontrolprotocol/extensions registerAllExtensions", () => {
 
   it("does not bundle host-specific or credentialed providers", () => {
     expect(BUNDLED_EXTENSION_IDS).not.toContain("@executioncontrolprotocol/chrome-ai")
-    expect(BUNDLED_EXTENSION_IDS).not.toContain("@executioncontrolprotocol/claude")
+    expect(BUNDLED_EXTENSION_IDS).not.toContain("@executioncontrolprotocol/anthropic")
   })
 })

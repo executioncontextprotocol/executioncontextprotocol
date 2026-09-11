@@ -6,8 +6,10 @@ import {
 } from "../harness-coding-bindings.js"
 import { registerNodeRuntime, NODE_RUNTIME_ID } from "@executioncontrolprotocol/node"
 import { registerOllamaExtension } from "@executioncontrolprotocol/extension-ollama"
+import { registerAnthropicExtension } from "@executioncontrolprotocol/anthropic"
 import { registerFormatToonExtension } from "@executioncontrolprotocol/format-toon"
 import type { EvalProviderProfile } from "../profiles/eval-provider.js"
+import { setActiveEvalProvider } from "../profiles/eval-provider-context.js"
 import { matrixExtensionBindings, providerExtensionBinding } from "./shared-eval-extensions.js"
 
 async function registerNodeCodingMatrixEval(provider: EvalProviderProfile): Promise<void> {
@@ -16,6 +18,9 @@ async function registerNodeCodingMatrixEval(provider: EvalProviderProfile): Prom
   await registerNodeRuntime()
   if (provider.providerId === "@executioncontrolprotocol/ollama") {
     await registerOllamaExtension()
+  }
+  if (provider.providerId === "@executioncontrolprotocol/anthropic") {
+    await registerAnthropicExtension()
   }
   await registerFormatToonExtension()
   await registerTestExtension()
@@ -31,6 +36,7 @@ export async function createHarnessNodeCodingMatrixEnvironment(provider: EvalPro
       `createHarnessNodeCodingMatrixEnvironment expects runtime "node", got ${provider.runtime}`
     )
   }
+  setActiveEvalProvider(provider)
   await registerNodeCodingMatrixEval(provider)
   return environment(
     `harness-${provider.id}-coding-matrix-eval`,
