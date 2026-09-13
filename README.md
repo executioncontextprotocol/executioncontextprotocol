@@ -24,11 +24,12 @@ Think of ECP as:
 
 ## Getting Started
 
-**Prerequisites:** Node.js 22+, pnpm. For OpenAI: set `OPENAI_API_KEY`. For Ollama: [install Ollama](https://ollama.com/) and run it locally.
+**Prerequisites:** Node.js 22+, pnpm (`corepack enable`). For OpenAI: set `OPENAI_API_KEY`. For Ollama: [install Ollama](https://ollama.com/) and run it locally.
 
 ```bash
 git clone https://github.com/executioncontrolprotocol/executioncontrolprotocol.git
 cd executioncontrolprotocol
+corepack enable
 pnpm install
 pnpm run build
 ```
@@ -52,10 +53,11 @@ ecp run examples/01-echo/workflow.ts --env examples/01-echo/environment.ts
 ecp validate examples/01-echo/workflow.ts --env examples/01-echo/environment.ts
 ```
 
+**Prefer the browser?** Open the [hosted Graph Editor](https://demo.executioncontrolprotocol.io/) or clone [browser-demo](https://github.com/executioncontrolprotocol/browser-demo) (`pnpm install` + `pnpm run dev`).
+
 **Monorepo guide (commands + package boundaries):** [`AGENTS.md`](AGENTS.md)  
 **Implementation spec (source of truth):** [`ecp-overhaul.md`](ecp-overhaul.md)  
-**Docs:** [`docs/`](docs/)
-
+**Docs:** [https://executioncontrolprotocol.io/](https://executioncontrolprotocol.io/) (in-repo [`docs/`](docs/) is maintainer notes)
 ------------------------------------------------------------------------
 
 ## Why ECP Exists
@@ -135,8 +137,8 @@ ECP builds directly on the Model Context Protocol.
 MCP Overview:
 https://modelcontextprotocol.io/
 
-MCP Specification (example schema):
-https://modelcontextprotocol.io/docs/specification
+MCP Specification:
+https://modelcontextprotocol.io/specification/2026-07-28
 
 MCP standardizes:
 
@@ -304,6 +306,7 @@ This repo is the **ECP Fluent API monorepo** (`@executioncontrolprotocol/*`). Fo
 | [`packages/runtimes/browser/`](packages/runtimes/browser/) | Browser runtime host: registry, session config (`@executioncontrolprotocol/browser`) — **not** the demo UI |
 | [`packages/runtimes/temporal/`](packages/runtimes/temporal/) | Temporal runtime adapter stub (`@executioncontrolprotocol/runtime-temporal`) |
 | [Browser demo (standalone repo)](https://github.com/executioncontrolprotocol/browser-demo) | Reference browser demo app (Vite + React): chat, panels, provider picker |
+| [Vendor extensions (standalone repo)](https://github.com/executioncontrolprotocol/extensions) | Vendor integrations (fal, Slack, image-sharp, Adobe, …) — canonical package list in that README |
 | [`packages/cli/`](packages/cli/) | CLI (`ecp run`, `ecp compile`, `ecp encode`, …) |
 | [`packages/extensions/`](packages/extensions/) | First-party extensions (TOON, Mermaid, providers, …) |
 | [`packages/harnesses/`](packages/harnesses/) | Harnesses (agent-facing author/repair/invoke flows); used by demo + evals |
@@ -313,7 +316,7 @@ This repo is the **ECP Fluent API monorepo** (`@executioncontrolprotocol/*`). Fo
 | [`examples/`](examples/) | Fluent workflow + environment examples (`workflow.ts`, `environment.ts`) |
 | [`archive/legacy-v0.5/`](archive/legacy-v0.5/) | Archived v0.5 Context YAML CLI and docs |
 | [`ecp-overhaul.md`](ecp-overhaul.md) | Current implementation spec |
-| [`docs/`](docs/) | Project documentation (browser demo, harness evals, patch model, etc.) |
+| [`docs/`](docs/) | Maintainer notes (harness evals, patch model, etc.) — public docs: [executioncontrolprotocol.io](https://executioncontrolprotocol.io/) |
 
 ------------------------------------------------------------------------
 
